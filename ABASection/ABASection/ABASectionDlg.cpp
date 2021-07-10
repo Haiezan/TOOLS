@@ -183,8 +183,8 @@ HCURSOR CABASectionDlg::OnQueryDragIcon()
 
 void CABASectionDlg::InitialSecList()
 {
-	m_SecList.push_back(CSection(TRACT_PILLAR_ST_CROSS));
-	m_SecList.push_back(CSection(TRACT_PILLAR_ST_I));
+	m_SecList.push_back(CSection(TRACT_CROSS_I));
+	m_SecList.push_back(CSection(TRACT_I));
 	//m_SecList[0].ID = IDB_BITMAP1;
 
 }
@@ -221,7 +221,7 @@ void CABASectionDlg::InitialSecPar(BOOL bFlag)
 			m_cListPar.SetItemText(i, 2, str3);
 		}
 		//IDB_BITMAP1
-		OnPaint(m_cSec.ID);
+		OnPaint(m_cSec.sPath);
 	}
 	else
 	{
@@ -337,4 +337,17 @@ void CABASectionDlg::OnPaint(int num)
 
 	rgn.DeleteObject();
 	if (pDC) ReleaseDC(pDC);
+}
+
+void CABASectionDlg::OnPaint(CString sPath)
+{
+	CRect rect;
+
+	m_cPic.GetWindowRect(&rect);
+
+	HBITMAP hBmp = (HBITMAP)::LoadImage(0, sPath, IMAGE_BITMAP, 358, 322, LR_LOADFROMFILE);
+
+	m_cPic.ModifyStyle(NULL, SS_BITMAP);
+
+	m_cPic.SetBitmap(hBmp);
 }

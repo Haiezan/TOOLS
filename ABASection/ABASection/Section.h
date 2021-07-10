@@ -4,8 +4,8 @@ using namespace std;
 
 enum SECTION_SHAPE
 {
-	TRACT_PILLAR_ST_CROSS = 0,      //十字工型截面
-	TRACT_PILLAR_ST_I = 1,      //工型截面
+	TRACT_CROSS_I = 0,      //十字工型截面
+	TRACT_I = 1,      //工型截面
 
 };
 
@@ -26,6 +26,7 @@ public:
 	~CSection();
 	SECTION_SHAPE Shape;
 	CString sName;
+	CString sPath;
 	vector<sPar> Pars;
 	int ID;
 

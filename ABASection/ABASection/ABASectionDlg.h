@@ -60,4 +60,5 @@ public:
 	
 	CStatic m_cPic;
 	void OnPaint(int num);
+	void OnPaint(CString sPath);
 };

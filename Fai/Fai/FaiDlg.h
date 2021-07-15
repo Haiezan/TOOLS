@@ -38,10 +38,12 @@ public:
 	float m_fCxb;
 	// 屈服强度
 	float m_fFy;
-
+	// 弹性模量
+	float m_fE;
+	// 稳定系数
 	float m_fFai;
 	CString m_sMsg;
 	afx_msg void OnBnClickedButton1();
-	// 弹性模量
-	float m_fE;
+	CString GetTime();
+	
 };

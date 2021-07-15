@@ -239,10 +239,25 @@ void CFaiDlg::OnBnClickedButton1()
 	{
 		m_fFai = 1.f / (2.f * lagdn*lagdn)*((a2 + a3 * lagdn + lagdn * lagdn) - sqrt((a2 + a3 * lagdn + lagdn * lagdn) * (a2 + a3 * lagdn + lagdn * lagdn) - 4.f * lagdn*lagdn));
 	}
-
+	CString strTime = GetTime();
 	CString str;
-	str.Format(_T("λ/εk=%5.0f\tφ=%5.3f\r\n"), m_fCxb / etak, m_fFai);
+	str.Format(_T("[%s] λ/εk=%5.0f\tφ=%5.3f\r\n"), strTime, m_fCxb / etak, m_fFai);
+	
 	m_sMsg += str;
 
 	UpdateData(FALSE);
+}
+
+CString CFaiDlg::GetTime()
+{
+	CTime time = CTime::GetCurrentTime();   ///构造CTime对象
+	int m_nYear = time.GetYear();      ///年
+	int m_nMonth = time.GetMonth();      ///月
+	int m_nDay = time.GetDay();      ///日
+	int m_nHour = time.GetHour();      ///小时
+	int m_nMinute = time.GetMinute();   ///分钟
+	int m_nSecond = time.GetSecond();   ///秒
+
+	CString m_strTime = time.Format("%Y-%m-%d %H:%M:%S");
+	return m_strTime;
 }

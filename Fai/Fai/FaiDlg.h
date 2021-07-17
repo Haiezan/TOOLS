@@ -39,11 +39,12 @@ public:
 	float m_fFy; //屈服强度
 	float m_fE; //弹性模量
 	float m_fFai; //稳定系数
-	float GetFai(int iCag, float fCxb, float fFy, float fE); //计算稳定系数
+	//float GetFai(int iCag, float fCxb, float fFy, float fE); //计算稳定系数
 
 	CString m_sMsg;
 	afx_msg void OnBnClickedButton1();
 	CString GetTime();
 	
 	afx_msg void OnCbnSelchangeComboCatg();
+	afx_msg void OnBnClickedButtonTable();
 };

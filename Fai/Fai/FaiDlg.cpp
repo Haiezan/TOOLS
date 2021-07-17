@@ -6,6 +6,7 @@
 #include "Fai.h"
 #include "FaiDlg.h"
 #include "afxdialogex.h"
+#include "function.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -78,6 +79,7 @@ BEGIN_MESSAGE_MAP(CFaiDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CFaiDlg::OnBnClickedButton1)
 	ON_CBN_SELCHANGE(IDC_COMBO_CATG, &CFaiDlg::OnCbnSelchangeComboCatg)
+	ON_BN_CLICKED(IDC_BUTTON_TABLE, &CFaiDlg::OnBnClickedButtonTable)
 END_MESSAGE_MAP()
 
 
@@ -172,8 +174,6 @@ HCURSOR CFaiDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
 void CFaiDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -197,72 +197,6 @@ void CFaiDlg::OnCbnSelchangeComboCatg()
 	m_cCatg = 'a' + m_iCatg;
 }
 
-float CFaiDlg::GetFai(int iCag, float fCxb, float fFy, float fE)
-{
-	//获取计算参数
-	float etak = sqrt(235.f / m_fFy);
-	float lagdn = m_fCxb / 3.14f * sqrt(m_fFy / m_fE);
-	float fFai = 0.f;
-
-	float a1, a2, a3;
-	switch (iCag)
-	{
-	case 0:
-		a1 = 0.41f;
-		a2 = 0.986f;
-		a3 = 0.152f;
-		break;
-	case 1:
-		a1 = 0.65f;
-		a2 = 0.965f;
-		a3 = 0.3f;
-		break;
-	case 2:
-		a1 = 0.73f;
-		if (lagdn <= 1.05)
-		{
-			a2 = 0.906f;
-			a3 = 0.595f;
-		}
-		else
-		{
-			a2 = 1.216f;
-			a3 = 0.302f;
-		}
-		break;
-	case 3:
-		a1 = 1.35f;
-		if (lagdn <= 1.05)
-		{
-			a2 = 0.868f;
-			a3 = 0.915f;
-		}
-		else
-		{
-			a2 = 1.375f;
-			a3 = 0.432f;
-		}
-		break;
-	default:
-		a1 = 0.f;
-		a2 = 0.f;
-		a3 = 0.f;
-		break;
-	}
-
-	//计算fai值
-	if (lagdn <= 0.215f)
-	{
-		fFai = 1 - a1 * lagdn*lagdn;
-	}
-	else
-	{
-		fFai = 1.f / (2.f * lagdn*lagdn)*((a2 + a3 * lagdn + lagdn * lagdn) - sqrt((a2 + a3 * lagdn + lagdn * lagdn) * (a2 + a3 * lagdn + lagdn * lagdn) - 4.f * lagdn*lagdn));
-	}
-
-	return fFai;
-}
-
 CString CFaiDlg::GetTime()
 {
 	CTime time = CTime::GetCurrentTime();   ///构造CTime对象
@@ -275,4 +209,12 @@ CString CFaiDlg::GetTime()
 
 	CString m_strTime = time.Format("%Y-%m-%d %H:%M:%S");
 	return m_strTime;
+}
+
+#include "DlgTable.h"
+void CFaiDlg::OnBnClickedButtonTable()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDlgTable cDlg;
+	cDlg.DoModal();
 }

@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DlgTable.h" />
     <ClInclude Include="Fai.h" />
     <ClInclude Include="FaiDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -190,8 +191,11 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgTable.cpp" />
     <ClCompile Include="Fai.cpp" />
     <ClCompile Include="FaiDlg.cpp" />
+    <ClCompile Include="function.cpp" />
+    <ClCompile Include="function.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

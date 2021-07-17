@@ -77,6 +77,7 @@ BEGIN_MESSAGE_MAP(CFaiDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CFaiDlg::OnBnClickedButton1)
+	ON_CBN_SELCHANGE(IDC_COMBO_CATG, &CFaiDlg::OnCbnSelchangeComboCatg)
 END_MESSAGE_MAP()
 
 
@@ -177,15 +178,34 @@ void CFaiDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData();
+	
+	m_fFai = GetFai(m_iCatg, m_fCxb, m_fFy, m_fE);
+	
+	CString strTime = GetTime();
+	CString str;
+	str.Format(_T("[%s] Q%.0f\tλ=%.0f\tφ=%5.3f\r\n"), strTime, m_fFy, m_fCxb, m_fFai);
+	
+	m_sMsg += str;
 
+	UpdateData(FALSE);
+}
+
+void CFaiDlg::OnCbnSelchangeComboCatg()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_iCatg = m_cComboxCatg.GetCurSel();
+	m_cCatg = 'a' + m_iCatg;
+}
+
+float CFaiDlg::GetFai(int iCag, float fCxb, float fFy, float fE)
+{
+	//获取计算参数
 	float etak = sqrt(235.f / m_fFy);
 	float lagdn = m_fCxb / 3.14f * sqrt(m_fFy / m_fE);
+	float fFai = 0.f;
 
-	m_iCatg = m_cComboxCatg.GetCurSel();
-
-	//获取计算参数
 	float a1, a2, a3;
-	switch (m_iCatg)
+	switch (iCag)
 	{
 	case 0:
 		a1 = 0.41f;
@@ -233,19 +253,14 @@ void CFaiDlg::OnBnClickedButton1()
 	//计算fai值
 	if (lagdn <= 0.215f)
 	{
-		m_fFai = 1 - a1 * lagdn*lagdn;
+		fFai = 1 - a1 * lagdn*lagdn;
 	}
 	else
 	{
-		m_fFai = 1.f / (2.f * lagdn*lagdn)*((a2 + a3 * lagdn + lagdn * lagdn) - sqrt((a2 + a3 * lagdn + lagdn * lagdn) * (a2 + a3 * lagdn + lagdn * lagdn) - 4.f * lagdn*lagdn));
+		fFai = 1.f / (2.f * lagdn*lagdn)*((a2 + a3 * lagdn + lagdn * lagdn) - sqrt((a2 + a3 * lagdn + lagdn * lagdn) * (a2 + a3 * lagdn + lagdn * lagdn) - 4.f * lagdn*lagdn));
 	}
-	CString strTime = GetTime();
-	CString str;
-	str.Format(_T("[%s] λ/εk=%5.0f\tφ=%5.3f\r\n"), strTime, m_fCxb / etak, m_fFai);
-	
-	m_sMsg += str;
 
-	UpdateData(FALSE);
+	return fFai;
 }
 
 CString CFaiDlg::GetTime()

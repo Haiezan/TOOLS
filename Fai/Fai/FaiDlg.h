@@ -33,17 +33,17 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CComboBox m_cComboxCatg;
-	int m_iCatg;
-	// 长细比
-	float m_fCxb;
-	// 屈服强度
-	float m_fFy;
-	// 弹性模量
-	float m_fE;
-	// 稳定系数
-	float m_fFai;
+	int m_iCatg; //截面分类
+	char m_cCatg = 'a';
+	float m_fCxb; //长细比
+	float m_fFy; //屈服强度
+	float m_fE; //弹性模量
+	float m_fFai; //稳定系数
+	float GetFai(int iCag, float fCxb, float fFy, float fE); //计算稳定系数
+
 	CString m_sMsg;
 	afx_msg void OnBnClickedButton1();
 	CString GetTime();
 	
+	afx_msg void OnCbnSelchangeComboCatg();
 };

@@ -210,7 +210,12 @@
     <None Include="res\Fai.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\Fai.ico" />
+    <Image Include="res\favicon.ico" />
+    <Image Include="res\icon1.ico" />
+    <Image Include="res\wechater.bmp" />
+    <Image Include="res\wechater.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

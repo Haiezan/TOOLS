@@ -68,5 +68,20 @@
     <Image Include="res\Fai.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\wechater.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\wechater.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\favicon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

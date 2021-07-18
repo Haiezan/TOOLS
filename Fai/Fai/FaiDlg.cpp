@@ -57,7 +57,7 @@ CFaiDlg::CFaiDlg(CWnd* pParent /*=nullptr*/)
 	, m_sMsg(_T(""))
 	, m_fE(206000.f)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON2);
 }
 
 void CFaiDlg::DoDataExchange(CDataExchange* pDX)

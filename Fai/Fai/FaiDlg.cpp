@@ -57,7 +57,11 @@ CFaiDlg::CFaiDlg(CWnd* pParent /*=nullptr*/)
 	, m_sMsg(_T(""))
 	, m_fE(206000.f)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON2);
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//更改应用程序图标
+	HICON ico = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(ico, TRUE);//设置大图标
+	SetIcon(ico, FALSE);//设置小图标
 }
 
 void CFaiDlg::DoDataExchange(CDataExchange* pDX)

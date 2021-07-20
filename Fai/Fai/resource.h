@@ -8,7 +8,6 @@
 #define IDD_FAI_DIALOG                  102
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_TABLE                130
-#define IDB_BITMAP1                     135
 #define IDI_ICON1                       136
 #define IDI_ICON2                       137
 #define IDC_COMBO_CATG                  1000

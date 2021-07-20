@@ -47,4 +47,5 @@ public:
 	
 	afx_msg void OnCbnSelchangeComboCatg();
 	afx_msg void OnBnClickedButtonTable();
+	afx_msg void OnBnClickedButtonCurve();
 };

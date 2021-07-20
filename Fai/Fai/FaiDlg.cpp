@@ -84,6 +84,7 @@ BEGIN_MESSAGE_MAP(CFaiDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CFaiDlg::OnBnClickedButton1)
 	ON_CBN_SELCHANGE(IDC_COMBO_CATG, &CFaiDlg::OnCbnSelchangeComboCatg)
 	ON_BN_CLICKED(IDC_BUTTON_TABLE, &CFaiDlg::OnBnClickedButtonTable)
+	ON_BN_CLICKED(IDC_BUTTON_CURVE, &CFaiDlg::OnBnClickedButtonCurve)
 END_MESSAGE_MAP()
 
 
@@ -221,5 +222,13 @@ void CFaiDlg::OnBnClickedButtonTable()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CDlgTable cDlg;
+	cDlg.DoModal();
+}
+
+#include "DlgCurve.h"
+void CFaiDlg::OnBnClickedButtonCurve()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDlgCurve cDlg;
 	cDlg.DoModal();
 }

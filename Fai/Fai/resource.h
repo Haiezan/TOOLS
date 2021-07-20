@@ -10,6 +10,7 @@
 #define IDD_DIALOG_TABLE                130
 #define IDI_ICON1                       136
 #define IDI_ICON2                       137
+#define IDD_DIALOG_CURVE                138
 #define IDC_COMBO_CATG                  1000
 #define IDC_EDIT_CXB                    1001
 #define IDC_EDIT_FY                     1002
@@ -19,14 +20,16 @@
 #define IDC_BUTTON_TABLE                1006
 #define IDC_COMBO1                      1006
 #define IDC_LIST_TABLE                  1007
+#define IDC_BUTTON_CURVE                1008
+#define IDC_CUSTOM1                     1009
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

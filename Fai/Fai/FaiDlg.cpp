@@ -60,8 +60,8 @@ CFaiDlg::CFaiDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	//更改应用程序图标
 	HICON ico = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	SetIcon(ico, TRUE);//设置大图标
-	SetIcon(ico, FALSE);//设置小图标
+	//SetIcon(ico, TRUE);//设置大图标
+	//SetIcon(ico, FALSE);//设置小图标
 }
 
 void CFaiDlg::DoDataExchange(CDataExchange* pDX)
@@ -187,7 +187,8 @@ void CFaiDlg::OnBnClickedButton1()
 	
 	CString strTime = GetTime();
 	CString str;
-	str.Format(_T("[%s] Q%.0f\tλ=%.0f\tφ=%5.3f\r\n"), strTime, m_fFy, m_fCxb, m_fFai);
+	float lagdn = m_fCxb / sqrt(235.f / m_fFy);
+	str.Format(_T("[%s] Q%.0f\tλ=%.0f\tλ/εk=%.0f\r\nφ=%5.3f\r\n"), strTime, m_fFy, m_fCxb, lagdn, m_fFai);
 	
 	m_sMsg += str;
 

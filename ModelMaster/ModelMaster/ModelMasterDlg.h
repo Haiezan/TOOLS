@@ -1,18 +1,11 @@
 ﻿
 // ModelMasterDlg.h: 头文件
 //
-
-#pragma once
 #include <vector>
-using namespace std;
+#include"Project.h"
+#pragma once
 
-struct Project
-{
-	CString sName;
-	CString sPath;
-	vector<CString> sModelList;
-	vector<CFileFind> FileList;
-};
+using namespace std;
 
 // CModelMasterDlg 对话框
 class CModelMasterDlg : public CDialogEx
@@ -43,14 +36,11 @@ protected:
 public:
 	CString m_sPath;
 	afx_msg void OnBnClickedButton1();
-
 	void ScanFile(CString Dir);  //搜索文件
-	void AddModel(CString sFile);  //添加模型文件
+	void AddModel(FileInfo file);  //添加模型文件
 	void ShowTree();
 
 	vector<Project> m_ProjectList;
-	vector<CString>  m_FileList;
-	
+
 	CTreeCtrl m_cTree;
 };
-

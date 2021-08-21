@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{7B97B0C4-0228-4FB6-993C-8E733A901C9A}</ProjectGuid>
+    <ProjectGuid>{C5BE8B6D-5291-495A-92C8-D7FD08B82984}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <RootNamespace>ModelMaster</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="ModelMaster.h" />
     <ClInclude Include="ModelMasterDlg.h" />
+    <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

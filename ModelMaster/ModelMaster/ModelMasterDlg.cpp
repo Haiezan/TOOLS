@@ -157,15 +157,12 @@ HCURSOR CModelMasterDlg::OnQueryDragIcon()
 }
 
 
-
 void CModelMasterDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData();
-
 	ScanFile(m_sPath);
 	ShowTree();
-
 
 }
 
@@ -188,25 +185,29 @@ void CModelMasterDlg::ScanFile(CString Dir)
 			}
 			else                               //扫描到的是文件
 			{
-				CString strFile = finder.GetFilePath();     //得到文件的全路径
+				//CString strFile = finder.GetFilePath();     //得到文件的全路径
+
+				FileInfo file;
+				file.FileName = finder.GetFileName();
+				file.FilePath = finder.GetFilePath();
+				file.FileTitle = finder.GetFileTitle();
+				file.FileURL = finder.GetFileURL();
+				file.Root = finder.GetRoot();
+
 				CString str = L".ssg";
-				if (strFile.Find(str) >= 0)
+				if (file.FilePath.Find(str) >= 0)
 				{
-					AddModel(strFile);
-
-					m_FileList.push_back(strFile);
+					AddModel(file);
 				}
-
-
 			}
 		}
 	}
 	finder.Close();
 }
 
-void CModelMasterDlg::AddModel(CString sFile)
+void CModelMasterDlg::AddModel(FileInfo file)
 {
-
+	CString sFile = file.FilePath;
 	CString str = sFile.Right(sFile.GetLength() - m_sPath.GetLength() - 1);
 	CString sModelName = str.Left(str.Find('\\'));
 	CString sModelPath = m_sPath + "\\" + sModelName;
@@ -217,7 +218,7 @@ void CModelMasterDlg::AddModel(CString sFile)
 	{
 		if (sModelName.Compare(m_ProjectList[i].sName) == 0)
 		{
-			m_ProjectList[i].sModelList.push_back(sFile);
+			m_ProjectList[i].FileList.push_back(file);
 			return;
 		}
 	}
@@ -225,7 +226,7 @@ void CModelMasterDlg::AddModel(CString sFile)
 	Project project;
 	project.sName = sModelName;
 	project.sPath = sModelPath;
-	project.sModelList.push_back(sFile);
+	project.FileList.push_back(file);
 	m_ProjectList.push_back(project);
 }
 
@@ -242,10 +243,10 @@ void CModelMasterDlg::ShowTree()
 		Project project = m_ProjectList[m];
 		hRoot = m_cTree.InsertItem(project.sName, TVI_ROOT);
 
-		for (int i = 0; i < project.sModelList.size(); i++)
+		for (int i = 0; i < project.FileList.size(); i++)
 		{
-			CString file = project.sModelList[i];
-			CString str = file.Right(file.Find('\\'));
+			FileInfo file = project.FileList[i];
+			CString str = file.FileName;
 
 			hCataItem = m_cTree.InsertItem(str, hRoot, TVI_LAST);
 

@@ -3,7 +3,16 @@
 //
 
 #pragma once
+#include <vector>
+using namespace std;
 
+struct Project
+{
+	CString sName;
+	CString sPath;
+	vector<CString> sModelList;
+	vector<CFileFind> FileList;
+};
 
 // CModelMasterDlg 对话框
 class CModelMasterDlg : public CDialogEx
@@ -31,4 +40,17 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	CString m_sPath;
+	afx_msg void OnBnClickedButton1();
+
+	void ScanFile(CString Dir);  //搜索文件
+	void AddModel(CString sFile);  //添加模型文件
+	void ShowTree();
+
+	vector<Project> m_ProjectList;
+	vector<CString>  m_FileList;
+	
+	CTreeCtrl m_cTree;
 };
+

@@ -51,6 +51,7 @@ END_MESSAGE_MAP()
 
 CModelMasterDlg::CModelMasterDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MODELMASTER_DIALOG, pParent)
+	, m_sPath(_T("D:\\04 Support"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -58,12 +59,15 @@ CModelMasterDlg::CModelMasterDlg(CWnd* pParent /*=nullptr*/)
 void CModelMasterDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT_PATH, m_sPath);
+	DDX_Control(pDX, IDC_TREE1, m_cTree);
 }
 
 BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CModelMasterDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +156,104 @@ HCURSOR CModelMasterDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CModelMasterDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData();
+
+	ScanFile(m_sPath);
+	ShowTree();
+
+
+}
+
+void CModelMasterDlg::ScanFile(CString Dir)
+{
+	CFileFind finder;
+	CString Add = L"\\*";
+	CString DirSpec = Dir + Add;                        //补全要遍历的文件夹的目录
+	BOOL bWorking = finder.FindFile(DirSpec);
+
+	while (bWorking)
+	{
+		bWorking = finder.FindNextFile();
+		if (!finder.IsDots())              //扫描到的不是节点
+		{
+			if (finder.IsDirectory())           //扫描到的是文件夹
+			{
+				CString strDirectory = finder.GetFilePath();
+				ScanFile(strDirectory);           //递归调用ScanFile（）
+			}
+			else                               //扫描到的是文件
+			{
+				CString strFile = finder.GetFilePath();     //得到文件的全路径
+				CString str = L".ssg";
+				if (strFile.Find(str) >= 0)
+				{
+					AddModel(strFile);
+
+					m_FileList.push_back(strFile);
+				}
+
+
+			}
+		}
+	}
+	finder.Close();
+}
+
+void CModelMasterDlg::AddModel(CString sFile)
+{
+
+	CString str = sFile.Right(sFile.GetLength() - m_sPath.GetLength() - 1);
+	CString sModelName = str.Left(str.Find('\\'));
+	CString sModelPath = m_sPath + "\\" + sModelName;
+
+	CString sFileName = sFile.Right(sFile.Find('\\'));
+
+	for (int i = 0; i < m_ProjectList.size(); i++)
+	{
+		if (sModelName.Compare(m_ProjectList[i].sName) == 0)
+		{
+			m_ProjectList[i].sModelList.push_back(sFile);
+			return;
+		}
+	}
+
+	Project project;
+	project.sName = sModelName;
+	project.sPath = sModelPath;
+	project.sModelList.push_back(sFile);
+	m_ProjectList.push_back(project);
+}
+
+void CModelMasterDlg::ShowTree()
+{
+	if (m_ProjectList.size() < 1) return;
+
+	HTREEITEM hRoot;     // 树的根节点的句柄   
+	HTREEITEM hCataItem; // 可表示任一分类节点的句柄
+
+	for (int m = 0; m < m_ProjectList.size(); m++)
+	{
+		//switch (m_PmmData[i].MatType)
+		Project project = m_ProjectList[m];
+		hRoot = m_cTree.InsertItem(project.sName, TVI_ROOT);
+
+		for (int i = 0; i < project.sModelList.size(); i++)
+		{
+			CString file = project.sModelList[i];
+			CString str = file.Right(file.Find('\\'));
+
+			hCataItem = m_cTree.InsertItem(str, hRoot, TVI_LAST);
+
+			m_cTree.SetCheck(hCataItem, FALSE);
+			BOOL bCheck = m_cTree.GetCheck(hCataItem);
+		}
+
+		//展开树状菜单
+		m_cTree.Expand(hRoot, TVE_EXPAND);
+	}
+}

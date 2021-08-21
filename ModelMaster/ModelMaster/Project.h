@@ -12,6 +12,10 @@ struct FileInfo
 	CString FileURL;
 	CString Root;
 
+	CTime LastWriteTime;
+	CTime LastAccessTime;
+	CTime CreationTime;
+
 	FileInfo(CFileFind file)
 	{
 		FileName = file.GetFileName();

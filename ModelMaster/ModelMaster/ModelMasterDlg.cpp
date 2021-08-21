@@ -70,6 +70,8 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CModelMasterDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON_BACKUP, &CModelMasterDlg::OnBnClickedButtonBackup)
+	ON_BN_CLICKED(IDC_BUTTON_PATH, &CModelMasterDlg::OnBnClickedButtonPath)
 END_MESSAGE_MAP()
 
 
@@ -195,6 +197,10 @@ void CModelMasterDlg::ScanFile(CString Dir)
 				file.FileTitle = finder.GetFileTitle();
 				file.FileURL = finder.GetFileURL();
 				file.Root = finder.GetRoot();
+				
+				finder.GetLastWriteTime(file.LastWriteTime);
+				finder.GetLastAccessTime(file.LastAccessTime);
+				finder.GetCreationTime(file.CreationTime);
 
 				//目标文件后缀
 				CStringArray szList;
@@ -313,4 +319,84 @@ int CModelMasterDlg::SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArra
 		}
 	} while (1);
 	return rArrString.GetSize();
+}
+
+void CModelMasterDlg::OnBnClickedButtonBackup()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString path;
+
+	// 获取特定文件夹的LPITEMIDLIST，可以将之理解为HANDLE
+	// 所谓的特定文件夹,你可以用CSIDL_XXX来检索之。
+	LPITEMIDLIST rootLoation;
+	SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOP, &rootLoation);
+	if (rootLoation == NULL) {
+		// unkown error
+		return;
+	}
+	// 配置对话框
+	BROWSEINFO bi;
+	ZeroMemory(&bi, sizeof(bi));
+	bi.pidlRoot = rootLoation; // 文件夹对话框之根目录，不指定的话则为我的电脑
+	bi.lpszTitle = _T("选择备份目录"); // 可以不指定
+	// bi.ulFlags = BIF_EDITBOX | BIF_RETURNONLYFSDIRS;
+
+	// 打开对话框, 有点像DoModal
+	LPITEMIDLIST targetLocation = SHBrowseForFolder(&bi);
+	if (targetLocation != NULL) {
+		TCHAR targetPath[MAX_PATH];
+		SHGetPathFromIDList(targetLocation, targetPath);
+
+		path = targetPath;
+
+		CString str = L"选择备份目录为:" + path;
+		MessageBox(str,L"备份目录");
+		
+		//备份项目
+		for each (Project project in m_ProjectList)
+		{
+			CString dir = path + "\\" + project.sName;
+
+			if (!PathIsDirectory(dir))
+			{
+				CreateDirectory(dir, 0);//不存在则创建
+				for each (FileInfo file in project.FileList)
+				{
+					CString target = dir + "\\" + file.FileName;
+					bool m = CopyFile(file.FilePath, target, TRUE);
+				}
+			}
+		}
+	}
+}
+
+
+void CModelMasterDlg::OnBnClickedButtonPath()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	// 获取特定文件夹的LPITEMIDLIST，可以将之理解为HANDLE
+	// 所谓的特定文件夹,你可以用CSIDL_XXX来检索之。
+	LPITEMIDLIST rootLoation;
+	SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOP, &rootLoation);
+	if (rootLoation == NULL) {
+		// unkown error
+		return;
+	}
+	// 配置对话框
+	BROWSEINFO bi;
+	ZeroMemory(&bi, sizeof(bi));
+	bi.pidlRoot = rootLoation; // 文件夹对话框之根目录，不指定的话则为我的电脑
+	bi.lpszTitle = _T("选择备份目录"); // 可以不指定
+	// bi.ulFlags = BIF_EDITBOX | BIF_RETURNONLYFSDIRS;
+
+	// 打开对话框, 有点像DoModal
+	LPITEMIDLIST targetLocation = SHBrowseForFolder(&bi);
+	if (targetLocation != NULL) {
+		TCHAR targetPath[MAX_PATH];
+		SHGetPathFromIDList(targetLocation, targetPath);
+
+		m_sPath = targetPath;
+		UpdateData(FALSE);
+	}
 }

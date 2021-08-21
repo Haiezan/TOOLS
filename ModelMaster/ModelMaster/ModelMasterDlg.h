@@ -45,4 +45,6 @@ public:
 	CTreeCtrl m_cTree;
 	CString m_sTargetExt;
 	int SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArray& rArrString, BOOL bAllowNullString);
+	afx_msg void OnBnClickedButtonBackup();
+	afx_msg void OnBnClickedButtonPath();
 };

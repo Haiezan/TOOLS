@@ -40,7 +40,9 @@ public:
 	void AddModel(FileInfo file);  //添加模型文件
 	void ShowTree();
 
-	vector<Project> m_ProjectList;
+	vector<Project> m_ProjectList;  //项目列表
 
 	CTreeCtrl m_cTree;
+	CString m_sTargetExt;
+	int SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArray& rArrString, BOOL bAllowNullString);
 };

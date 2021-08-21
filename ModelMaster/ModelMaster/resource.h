@@ -10,6 +10,8 @@
 #define IDC_EDIT_PATH                   1000
 #define IDC_BUTTON1                     1001
 #define IDC_TREE1                       1002
+#define IDC_EDIT_PATH2                  1003
+#define IDC_EDIT_EXT                    1003
 
 // Next default values for new objects
 // 

@@ -11,6 +11,7 @@ struct FileInfo
 	CString FileTitle;
 	CString FileURL;
 	CString Root;
+
 	FileInfo(CFileFind file)
 	{
 		FileName = file.GetFileName();

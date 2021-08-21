@@ -52,6 +52,7 @@ END_MESSAGE_MAP()
 CModelMasterDlg::CModelMasterDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MODELMASTER_DIALOG, pParent)
 	, m_sPath(_T("D:\\04 Support"))
+	, m_sTargetExt(_T(".ssg,.SSG,.yjk,.jws,.JWS,.rar,.zip"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,6 +62,7 @@ void CModelMasterDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_PATH, m_sPath);
 	DDX_Control(pDX, IDC_TREE1, m_cTree);
+	DDX_Text(pDX, IDC_EDIT_EXT, m_sTargetExt);
 }
 
 BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
@@ -160,6 +162,7 @@ HCURSOR CModelMasterDlg::OnQueryDragIcon()
 void CModelMasterDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	m_ProjectList.clear();
 	UpdateData();
 	ScanFile(m_sPath);
 	ShowTree();
@@ -185,20 +188,28 @@ void CModelMasterDlg::ScanFile(CString Dir)
 			}
 			else                               //扫描到的是文件
 			{
-				//CString strFile = finder.GetFilePath();     //得到文件的全路径
-
-				FileInfo file;
+				FileInfo file;  //储存文件信息
+				file.Length = finder.GetLength();
 				file.FileName = finder.GetFileName();
 				file.FilePath = finder.GetFilePath();
 				file.FileTitle = finder.GetFileTitle();
 				file.FileURL = finder.GetFileURL();
 				file.Root = finder.GetRoot();
 
-				CString str = L".ssg";
-				if (file.FilePath.Find(str) >= 0)
+				//目标文件后缀
+				CStringArray szList;
+				CString szSplit = _T(",");
+				int n = SplitString(m_sTargetExt, szSplit, szList, FALSE);
+				for (int i = 0; i < n; i++)
 				{
-					AddModel(file);
+					CString str = szList.GetAt(i);
+					if (file.FilePath.Find(str) >= 0)
+					{
+						AddModel(file);
+					}
 				}
+
+				
 			}
 		}
 	}
@@ -232,6 +243,8 @@ void CModelMasterDlg::AddModel(FileInfo file)
 
 void CModelMasterDlg::ShowTree()
 {
+	m_cTree.DeleteAllItems();
+
 	if (m_ProjectList.size() < 1) return;
 
 	HTREEITEM hRoot;     // 树的根节点的句柄   
@@ -257,4 +270,47 @@ void CModelMasterDlg::ShowTree()
 		//展开树状菜单
 		m_cTree.Expand(hRoot, TVE_EXPAND);
 	}
+}
+
+int CModelMasterDlg::SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArray& rArrString, BOOL bAllowNullString)
+{
+	rArrString.RemoveAll();
+	CString szStr = lpszStr;
+	szStr.TrimLeft();
+	szStr.TrimRight();
+	if (szStr.GetLength() == 0)
+	{
+		return 0;
+	}
+	CString szSplit = lpszSplit;
+	if (szSplit.GetLength() == 0)
+	{
+		rArrString.Add(szStr);
+		return 1;
+	}
+	CString s;
+	int n;
+	do {
+		n = szStr.Find(szSplit);
+		if (n > 0)
+		{
+			rArrString.Add(szStr.Left(n));
+			szStr = szStr.Right(szStr.GetLength() - n - szSplit.GetLength());
+			szStr.TrimLeft();
+		}
+		else if (n == 0)
+		{
+			if (bAllowNullString)
+				rArrString.Add(_T(""));
+			szStr = szStr.Right(szStr.GetLength() - szSplit.GetLength());
+			szStr.TrimLeft();
+		}
+		else
+		{
+			if ((szStr.GetLength() > 0) || bAllowNullString)
+				rArrString.Add(szStr);
+			break;
+		}
+	} while (1);
+	return rArrString.GetSize();
 }

@@ -274,7 +274,7 @@ void CModelMasterDlg::ShowTree()
 		}
 
 		//展开树状菜单
-		m_cTree.Expand(hRoot, TVE_EXPAND);
+		//m_cTree.Expand(hRoot, TVE_EXPAND);
 	}
 }
 

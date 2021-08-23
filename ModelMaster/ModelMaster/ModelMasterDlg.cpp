@@ -353,9 +353,16 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 		SHGetPathFromIDList(targetLocation, targetPath);
 
 		path = targetPath;
+		CTime tm = CTime::GetCurrentTime();
+		CString stm;
+		stm.Format(_T("%04d%02d%02d"), tm.GetYear(), tm.GetMonth(), tm.GetDay());
+
+		path = path + "\\Backup" + stm;
 
 		CString str = L"选择备份目录为:" + path;
 		MessageBox(str,L"备份目录");
+
+		if (!PathIsDirectory(path)) CreateDirectory(path, 0);
 		
 		//备份项目
 		for each (Project project in m_ProjectList)

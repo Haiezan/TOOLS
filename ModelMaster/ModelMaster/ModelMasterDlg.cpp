@@ -53,6 +53,7 @@ CModelMasterDlg::CModelMasterDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MODELMASTER_DIALOG, pParent)
 	, m_sPath(_T("D:\\04 Support"))
 	, m_sTargetExt(_T(".ssg,.SSG,.yjk,.jws,.JWS,.rar,.zip"))
+	, m_iFileTime(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -63,6 +64,7 @@ void CModelMasterDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_PATH, m_sPath);
 	DDX_Control(pDX, IDC_TREE1, m_cTree);
 	DDX_Text(pDX, IDC_EDIT_EXT, m_sTargetExt);
+	DDX_Radio(pDX, IDC_RADIO1, m_iFileTime);
 }
 
 BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
@@ -325,6 +327,8 @@ int CModelMasterDlg::SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArra
 void CModelMasterDlg::OnBnClickedButtonBackup()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	UpdateData();
+
 	CString path;
 
 	// 获取特定文件夹的LPITEMIDLIST，可以将之理解为HANDLE
@@ -361,11 +365,11 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 			if (!PathIsDirectory(dir))
 			{
 				CreateDirectory(dir, 0);//不存在则创建
-				for each (FileInfo file in project.FileList)
-				{
-					CString target = dir + "\\" + file.FileName;
-					bool m = CopyFile(file.FilePath, target, TRUE); //覆盖重复文件
-				}
+			}
+			for each (FileInfo file in project.FileList)
+			{
+				CString target = dir + "\\" + file.FileName;
+				bool m = CopyFile(file.FilePath, target, m_iFileTime); //覆盖重复文件
 			}
 		}
 	}

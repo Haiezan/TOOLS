@@ -35,6 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CString m_sPath;
+	afx_msg void OnBnClickedButtonPath();
 	afx_msg void OnBnClickedButton1();
 	void ScanFile(CString Dir);  //搜索文件
 	void AddModel(FileInfo file);  //添加模型文件
@@ -46,5 +47,5 @@ public:
 	CString m_sTargetExt;
 	int SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArray& rArrString, BOOL bAllowNullString);
 	afx_msg void OnBnClickedButtonBackup();
-	afx_msg void OnBnClickedButtonPath();
+	int m_iFileTime;
 };

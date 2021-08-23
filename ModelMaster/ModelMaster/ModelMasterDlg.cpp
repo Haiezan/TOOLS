@@ -235,7 +235,7 @@ void CModelMasterDlg::AddModel(FileInfo file)
 	{
 		if (sModelName.Compare(m_ProjectList[i].sName) == 0)
 		{
-			m_ProjectList[i].FileList.push_back(file);
+			m_ProjectList[i].InsertFile(file);
 			return;
 		}
 	}
@@ -243,8 +243,9 @@ void CModelMasterDlg::AddModel(FileInfo file)
 	Project project;
 	project.sName = sModelName;
 	project.sPath = sModelPath;
-	project.FileList.push_back(file);
+	project.InsertFile(file);
 	m_ProjectList.push_back(project);
+	return;
 }
 
 void CModelMasterDlg::ShowTree()
@@ -363,7 +364,7 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 				for each (FileInfo file in project.FileList)
 				{
 					CString target = dir + "\\" + file.FileName;
-					bool m = CopyFile(file.FilePath, target, TRUE);
+					bool m = CopyFile(file.FilePath, target, TRUE); //覆盖重复文件
 				}
 			}
 		}

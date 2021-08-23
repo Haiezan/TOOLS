@@ -31,4 +31,20 @@ struct Project
 	CString sPath;
 	vector<CString> sModelList;
 	vector<FileInfo> FileList;
+
+	void InsertFile(FileInfo file)
+	{
+		for (int i = 0; i < FileList.size(); i++)
+		{
+			CTime ta = FileList[i].LastWriteTime;
+			CTime tt = file.LastWriteTime;
+			if (tt < ta)
+			{
+				FileList.insert(FileList.begin() + i, file);
+				return;
+			}
+		}
+		FileList.push_back(file);
+		return;
+	}
 };

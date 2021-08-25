@@ -171,12 +171,14 @@ void CModelMasterDlg::OnBnClickedButton1()
 	ScanFile(m_sPath);
 	ShowTree();
 
+	//m_ProjectList[2].FileList[0].OpenFile("D:\\Program Files\\SAUSG2021\\sausage.exe");
+
 }
 
 void CModelMasterDlg::ScanFile(CString Dir)
 {
 	CFileFind finder;
-	CString Add = L"\\*";
+	CString Add = "\\*";
 	CString DirSpec = Dir + Add;                        //补全要遍历的文件夹的目录
 	BOOL bWorking = finder.FindFile(DirSpec);
 
@@ -355,12 +357,12 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 		path = targetPath;
 		CTime tm = CTime::GetCurrentTime();
 		CString stm;
-		stm.Format(_T("%04d%02d%02d"), tm.GetYear(), tm.GetMonth(), tm.GetDay());
+		stm.Format("%04d%02d%02d", tm.GetYear(), tm.GetMonth(), tm.GetDay());
 
 		path = path + "\\Backup" + stm;
 
-		CString str = L"选择备份目录为:" + path;
-		MessageBox(str,L"备份目录");
+		CString str = "选择备份目录为:" + path;
+		MessageBox(str,"备份目录");
 
 		if (!PathIsDirectory(path)) CreateDirectory(path, 0);
 		

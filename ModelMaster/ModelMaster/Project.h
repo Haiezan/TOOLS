@@ -16,6 +16,8 @@ struct FileInfo
 	CTime LastAccessTime;
 	CTime CreationTime;
 
+	float BuInfo[10] = { 0.f };
+
 	FileInfo(CFileFind file)
 	{
 		FileName = file.GetFileName();
@@ -23,6 +25,13 @@ struct FileInfo
 		FileTitle = file.GetFileTitle();
 	}
 	FileInfo() {}
+	bool OpenFile(CString exe)
+	{
+		CString str;
+		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, FilePath);
+		WinExec(str.GetBuffer(0), SW_SHOW);
+		return true;
+	}
 };
 
 struct Project

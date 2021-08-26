@@ -38,7 +38,7 @@ public:
 	afx_msg void OnBnClickedButtonPath();
 	afx_msg void OnBnClickedButton1();
 	void ScanFile(CString Dir);  //搜索文件
-	void AddModel(FileInfo file);  //添加模型文件
+	void AddModel(CFileInfo file);  //添加模型文件
 	void ShowTree();
 
 	vector<Project> m_ProjectList;  //项目列表
@@ -54,5 +54,5 @@ public:
 	HTREEITEM m_hCurItem;
 	afx_msg void OnRightTxt();
 
-	FileInfo GetFileInfo(HTREEITEM m_hCurItem);
+	CFileInfo GetFileInfo(HTREEITEM m_hCurItem);
 };

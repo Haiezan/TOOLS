@@ -197,7 +197,7 @@ void CModelMasterDlg::ScanFile(CString Dir)
 			}
 			else                               //扫描到的是文件
 			{
-				FileInfo file;  //储存文件信息
+				CFileInfo file;  //储存文件信息
 				file.Length = finder.GetLength();
 				file.FileName = finder.GetFileName();
 				file.FilePath = finder.GetFilePath();
@@ -231,7 +231,7 @@ void CModelMasterDlg::ScanFile(CString Dir)
 	finder.Close();
 }
 
-void CModelMasterDlg::AddModel(FileInfo file)
+void CModelMasterDlg::AddModel(CFileInfo file)
 {
 	CString sFile = file.FilePath;
 	CString str = sFile.Right(sFile.GetLength() - m_sPath.GetLength() - 1);
@@ -274,7 +274,7 @@ void CModelMasterDlg::ShowTree()
 
 		for (int i = 0; i < pProject->FileList.size(); i++)
 		{
-			FileInfo* pFile = &pProject->FileList[i];
+			CFileInfo* pFile = &pProject->FileList[i];
 			CString str = pFile->FileName;
 
 			hCataItem = m_cTree.InsertItem(str, hRoot, TVI_LAST);
@@ -379,7 +379,7 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 			{
 				CreateDirectory(dir, 0);//不存在则创建
 			}
-			for each (FileInfo file in project.FileList)
+			for each (CFileInfo file in project.FileList)
 			{
 				CString target = dir + "\\" + file.FileName;
 				bool m = CopyFile(file.FilePath, target, m_iFileTime); //覆盖重复文件
@@ -451,9 +451,9 @@ void CModelMasterDlg::OnNMRClickTree1(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-FileInfo CModelMasterDlg::GetFileInfo(HTREEITEM hItem)
+CFileInfo CModelMasterDlg::GetFileInfo(HTREEITEM hItem)
 {
-	FileInfo file;
+	CFileInfo file;
 	for (int i = 0; i < m_ProjectList.size(); i++)
 	{
 		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
@@ -472,7 +472,7 @@ FileInfo CModelMasterDlg::GetFileInfo(HTREEITEM hItem)
 void CModelMasterDlg::OnRightOpen()
 {
 	// TODO: 在此添加命令处理程序代码
-	FileInfo file = GetFileInfo(m_hCurItem);
+	CFileInfo file = GetFileInfo(m_hCurItem);
 
 	CString str;
 	if (strcmp(file.Ext, "ssg") == 0)
@@ -488,7 +488,7 @@ void CModelMasterDlg::OnRightOpen()
 void CModelMasterDlg::OnRightTxt()
 {
 	// TODO: 在此添加命令处理程序代码
-	FileInfo file = GetFileInfo(m_hCurItem);
+	CFileInfo file = GetFileInfo(m_hCurItem);
 
 	CString str;
 	str.Format("notepad %s", file.FilePath);

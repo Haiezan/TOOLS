@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FileInfo.h" />
     <ClInclude Include="ModelMaster.h" />
     <ClInclude Include="ModelMasterDlg.h" />
     <ClInclude Include="Project.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="ModelMaster.cpp" />
     <ClCompile Include="ModelMasterDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

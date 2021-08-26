@@ -1,49 +1,17 @@
 #pragma once
 #include "stdafx.h"
 #include <vector>
+#include "FileInfo.h"
 using namespace std;
-
-struct FileInfo
-{
-	ULONGLONG Length;
-	CString FileName;
-	CString FilePath;
-	CString FileTitle;
-	CString FileURL;
-	CString Root;
-
-	CString Ext;
-
-	CTime LastWriteTime;
-	CTime LastAccessTime;
-	CTime CreationTime;
-
-	HTREEITEM hItem;
-
-	float BuInfo[10] = { 0.f };
-
-	FileInfo(CFileFind file)
-	{
-		FileName = file.GetFileName();
-		FilePath = file.GetFilePath();
-		FileTitle = file.GetFileTitle();
-	}
-	FileInfo() {}
-	bool OpenFile(CString exe)
-	{
-		WinExec(exe.GetBuffer(0), SW_SHOW);
-		return true;
-	}
-};
 
 struct Project
 {
 	CString sName;
 	CString sPath;
 	vector<CString> sModelList;
-	vector<FileInfo> FileList;
+	vector<CFileInfo> FileList;
 
-	void InsertFile(FileInfo file)
+	void InsertFile(CFileInfo file)
 	{
 		for (int i = 0; i < FileList.size(); i++)
 		{

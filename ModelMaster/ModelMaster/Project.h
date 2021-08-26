@@ -16,6 +16,8 @@ struct FileInfo
 	CTime LastAccessTime;
 	CTime CreationTime;
 
+	HTREEITEM hItem;
+
 	float BuInfo[10] = { 0.f };
 
 	FileInfo(CFileFind file)

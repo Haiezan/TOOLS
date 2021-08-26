@@ -48,4 +48,8 @@ public:
 	int SplitString(LPCTSTR lpszStr, LPCTSTR lpszSplit, CStringArray& rArrString, BOOL bAllowNullString);
 	afx_msg void OnBnClickedButtonBackup();
 	int m_iFileTime;
+	afx_msg void OnNMRClickTree1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnRightOpen();
+
+	HTREEITEM m_hCurItem;
 };

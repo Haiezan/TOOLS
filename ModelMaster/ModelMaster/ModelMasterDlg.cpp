@@ -74,6 +74,8 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CModelMasterDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON_BACKUP, &CModelMasterDlg::OnBnClickedButtonBackup)
 	ON_BN_CLICKED(IDC_BUTTON_PATH, &CModelMasterDlg::OnBnClickedButtonPath)
+	ON_NOTIFY(NM_RCLICK, IDC_TREE1, &CModelMasterDlg::OnNMRClickTree1)
+	ON_COMMAND(ID_RIGHT_OPEN, &CModelMasterDlg::OnRightOpen)
 END_MESSAGE_MAP()
 
 
@@ -264,18 +266,17 @@ void CModelMasterDlg::ShowTree()
 	for (int m = 0; m < m_ProjectList.size(); m++)
 	{
 		//switch (m_PmmData[i].MatType)
-		Project project = m_ProjectList[m];
-		hRoot = m_cTree.InsertItem(project.sName, TVI_ROOT);
+		Project* pProject = &m_ProjectList[m];
+		hRoot = m_cTree.InsertItem(pProject->sName, TVI_ROOT);
 
-		for (int i = 0; i < project.FileList.size(); i++)
+		for (int i = 0; i < pProject->FileList.size(); i++)
 		{
-			FileInfo file = project.FileList[i];
-			CString str = file.FileName;
+			FileInfo* pFile = &pProject->FileList[i];
+			CString str = pFile->FileName;
 
 			hCataItem = m_cTree.InsertItem(str, hRoot, TVI_LAST);
 
-			m_cTree.SetCheck(hCataItem, FALSE);
-			BOOL bCheck = m_cTree.GetCheck(hCataItem);
+			pFile->hItem = hCataItem; //存储树地址
 		}
 
 		//展开树状菜单
@@ -413,4 +414,54 @@ void CModelMasterDlg::OnBnClickedButtonPath()
 		m_sPath = targetPath;
 		UpdateData(FALSE);
 	}
+}
+
+
+void CModelMasterDlg::OnNMRClickTree1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//动态加载菜单
+	CMenu menu[3];
+	menu[0].LoadMenu(IDR_MENU1);
+	//menu[1].LoadMenu(IDR_MENU3);
+	//menu[2].LoadMenu(IDR_MENU4);
+	CPoint pt;
+	//pt = GetCurrentMessage()->pt;   //获取当前鼠标点击消息的坐标点
+	GetCursorPos(&pt);
+	m_cTree.ScreenToClient(&pt);   //将鼠标的屏幕坐标，转换成树形控件的客户区坐标
+	UINT uFlags = 0;
+	HTREEITEM hItem = m_cTree.HitTest(pt, &uFlags); //然后做点击测试
+	if ((hItem != NULL) && (TVHT_ONITEM & uFlags))     //如果点击的位置是在节点位置上面
+	{
+		m_cTree.SelectItem(hItem);
+		//根据不同类型的节点弹出菜单
+		CMenu *psubmenu;
+		int nData = m_cTree.GetItemData(hItem);
+		m_cTree.ClientToScreen(&pt);
+
+		psubmenu = menu[0].GetSubMenu(0);
+		psubmenu->TrackPopupMenu(TPM_RIGHTBUTTON, pt.x, pt.y, this);
+
+		m_hCurItem = hItem;
+	}
+
+	*pResult = 0;
+}
+
+//打开模型文件
+void CModelMasterDlg::OnRightOpen()
+{
+	// TODO: 在此添加命令处理程序代码
+	for (int i = 0; i < m_ProjectList.size(); i++)
+	{
+		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
+		{
+			FileInfo file = m_ProjectList[i].FileList[j];
+			if (file.hItem == m_hCurItem)
+			{
+				file.OpenFile("D:\\Program Files\\SAUSG2021\\sausage.exe");
+			}
+		}
+	}
+
 }

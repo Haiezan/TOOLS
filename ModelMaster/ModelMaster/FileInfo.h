@@ -27,6 +27,5 @@ public:
 	float BuInfo[10] = { 0.f };
 
 	bool OpenFile(CString exe);
-	bool ReadBuInfo();
 };
 

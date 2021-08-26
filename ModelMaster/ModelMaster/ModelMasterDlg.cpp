@@ -6,6 +6,7 @@
 #include "ModelMaster.h"
 #include "ModelMasterDlg.h"
 #include "afxdialogex.h"
+#include "ReadFile.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -487,8 +488,14 @@ void CModelMasterDlg::OnRightOpen()
 
 void CModelMasterDlg::OnRightTxt()
 {
+	
+
+
 	// TODO: 在此添加命令处理程序代码
 	CFileInfo file = GetFileInfo(m_hCurItem);
+
+
+	ReadSSGFile(&file);
 
 	CString str;
 	str.Format("notepad %s", file.FilePath);

@@ -22,7 +22,3 @@ bool CFileInfo::OpenFile(CString exe)
 	WinExec(exe.GetBuffer(0), SW_SHOW);
 	return true;
 }
-bool CFileInfo::ReadBuInfo()
-{
-	return true;
-}

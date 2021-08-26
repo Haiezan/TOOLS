@@ -36,6 +36,12 @@
     <ClInclude Include="FileInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ReadAline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModelMaster.cpp">
@@ -48,6 +54,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FileInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadALine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

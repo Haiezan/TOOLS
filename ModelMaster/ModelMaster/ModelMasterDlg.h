@@ -55,4 +55,5 @@ public:
 	afx_msg void OnRightTxt();
 
 	CFileInfo GetFileInfo(HTREEITEM m_hCurItem);
+	afx_msg void OnBnClickedButtonWrite();
 };

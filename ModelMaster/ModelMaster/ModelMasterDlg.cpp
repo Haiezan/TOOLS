@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_NOTIFY(NM_RCLICK, IDC_TREE1, &CModelMasterDlg::OnNMRClickTree1)
 	ON_COMMAND(ID_RIGHT_OPEN, &CModelMasterDlg::OnRightOpen)
 	ON_COMMAND(ID_RIGHT_TXT, &CModelMasterDlg::OnRightTxt)
+	ON_BN_CLICKED(IDC_BUTTON_WRITE, &CModelMasterDlg::OnBnClickedButtonWrite)
 END_MESSAGE_MAP()
 
 
@@ -500,4 +501,28 @@ void CModelMasterDlg::OnRightTxt()
 	CString str;
 	str.Format("notepad %s", file.FilePath);
 	file.OpenFile(str);
+}
+
+
+void CModelMasterDlg::OnBnClickedButtonWrite()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	FILE* fd = fopen("info.csv","w");
+	fprintf(fd, "项目名称,文件名称,设防类别,场地类别,场地分组,地震烈度,层数,地下室层数,高度\n");
+	for (int i = 0; i < m_ProjectList.size(); i++)
+	{
+		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
+		{
+			CFileInfo* pfile = &m_ProjectList[i].FileList[j];
+			if (strcmp(pfile->Ext, "ssg") == 0)
+			{
+				ReadSSGFile(pfile);
+				fprintf(fd, "%s,%s,%f,%f,%f,%f,%f,%f,%f\n", m_ProjectList[i].sName,pfile->FileTitle, pfile->BuInfo[0], pfile->BuInfo[1], pfile->BuInfo[2], pfile->BuInfo[3], pfile->BuInfo[4], pfile->BuInfo[5], pfile->BuInfo[6]);
+			}
+		}
+	}
+
+	fclose(fd);
+
+
 }

@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_PATH, &CModelMasterDlg::OnBnClickedButtonPath)
 	ON_NOTIFY(NM_RCLICK, IDC_TREE1, &CModelMasterDlg::OnNMRClickTree1)
 	ON_COMMAND(ID_RIGHT_OPEN, &CModelMasterDlg::OnRightOpen)
+	ON_COMMAND(ID_RIGHT_TXT, &CModelMasterDlg::OnRightTxt)
 END_MESSAGE_MAP()
 
 
@@ -203,6 +204,8 @@ void CModelMasterDlg::ScanFile(CString Dir)
 				file.FileTitle = finder.GetFileTitle();
 				file.FileURL = finder.GetFileURL();
 				file.Root = finder.GetRoot();
+
+				file.Ext = file.FileName.Right(file.FileName.GetLength() - file.FileName.ReverseFind('.') - 1);
 				
 				finder.GetLastWriteTime(file.LastWriteTime);
 				finder.GetLastAccessTime(file.LastAccessTime);
@@ -448,20 +451,46 @@ void CModelMasterDlg::OnNMRClickTree1(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-//打开模型文件
-void CModelMasterDlg::OnRightOpen()
+FileInfo CModelMasterDlg::GetFileInfo(HTREEITEM hItem)
 {
-	// TODO: 在此添加命令处理程序代码
+	FileInfo file;
 	for (int i = 0; i < m_ProjectList.size(); i++)
 	{
 		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
 		{
-			FileInfo file = m_ProjectList[i].FileList[j];
+			file = m_ProjectList[i].FileList[j];
 			if (file.hItem == m_hCurItem)
 			{
-				file.OpenFile("D:\\Program Files\\SAUSG2021\\sausage.exe");
+				return file;
 			}
 		}
 	}
+	return file;
+}
 
+//打开模型文件
+void CModelMasterDlg::OnRightOpen()
+{
+	// TODO: 在此添加命令处理程序代码
+	FileInfo file = GetFileInfo(m_hCurItem);
+
+	CString str;
+	if (strcmp(file.Ext, "ssg") == 0)
+	{
+		CString exe = "D:\\Program Files\\SAUSG2021\\sausage.exe";
+		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, file.FilePath);
+	}
+
+	file.OpenFile(str);
+}
+
+
+void CModelMasterDlg::OnRightTxt()
+{
+	// TODO: 在此添加命令处理程序代码
+	FileInfo file = GetFileInfo(m_hCurItem);
+
+	CString str;
+	str.Format("notepad %s", file.FilePath);
+	file.OpenFile(str);
 }

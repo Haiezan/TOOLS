@@ -12,6 +12,8 @@ struct FileInfo
 	CString FileURL;
 	CString Root;
 
+	CString Ext;
+
 	CTime LastWriteTime;
 	CTime LastAccessTime;
 	CTime CreationTime;
@@ -29,9 +31,7 @@ struct FileInfo
 	FileInfo() {}
 	bool OpenFile(CString exe)
 	{
-		CString str;
-		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, FilePath);
-		WinExec(str.GetBuffer(0), SW_SHOW);
+		WinExec(exe.GetBuffer(0), SW_SHOW);
 		return true;
 	}
 };

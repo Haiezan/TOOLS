@@ -52,4 +52,7 @@ public:
 	afx_msg void OnRightOpen();
 
 	HTREEITEM m_hCurItem;
+	afx_msg void OnRightTxt();
+
+	FileInfo GetFileInfo(HTREEITEM m_hCurItem);
 };

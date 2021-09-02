@@ -36,16 +36,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	// 抗压强度
-	float m_fFc;
+	double m_fFc;
 	// 弹性模量
-	float m_fEc;
+	double m_fEc;
 
-	float ecr = 1471.8e-6f;
-	float ac = 0.75f;
-	float ecu2ecr = 2.99f;
+	double ecr = 1471.8e-6f;
+	double ac = 0.75f;
+	double ecu2ecr = 2.99f;
 
-	float GetDc(float e, float Ec, float fcr, float ecr, float ac);
-	float GetSigmaC(float e, float dc, float Ec);
+	double GetDc(double e, double Ec, double fcr, double ecr, double ac);
+	double GetSigmaC(double e, double dc, double Ec);
 	afx_msg void OnBnClickedButtonPlot();
 	CChartCtrl m_ChartCtrl;
 };

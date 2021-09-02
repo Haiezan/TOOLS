@@ -51,8 +51,8 @@ END_MESSAGE_MAP()
 
 CConcreteDlg::CConcreteDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CONCRETE_DIALOG, pParent)
-	, m_fFc(20.10f)
-	, m_fEc(3.0e4f)
+	, m_fFc(20.10)
+	, m_fEc(3.0e4)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -160,13 +160,13 @@ HCURSOR CConcreteDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-float CConcreteDlg::GetDc(float e, float Ec, float fcr, float ecr, float ac)
+double CConcreteDlg::GetDc(double e, double Ec, double fcr, double ecr, double ac)
 {
-	float dc = 0.f;
+	double dc = 0.f;
 
-	float pc = fcr / Ec / ecr;
-	float n = Ec * ecr / (Ec*ecr - fcr);
-	float x = e / ecr;
+	double pc = fcr / Ec / ecr;
+	double n = Ec * ecr / (Ec*ecr - fcr);
+	double x = e / ecr;
 
 	if (x <= 1.f)
 	{
@@ -178,9 +178,9 @@ float CConcreteDlg::GetDc(float e, float Ec, float fcr, float ecr, float ac)
 	}
 	return dc;
 }
-float CConcreteDlg::GetSigmaC(float e, float dc, float Ec)
+double CConcreteDlg::GetSigmaC(double e, double dc, double Ec)
 {
-	float sigma = (1 - dc)*Ec*e;
+	double sigma = (1 - dc)*Ec*e;
 	return sigma;
 }
 
@@ -198,7 +198,7 @@ void CConcreteDlg::OnBnClickedButtonPlot()
 	for (int i = 0; i < N; i++)
 	{
 		ee = i * de;
-		float dc = GetDc(ee, m_fEc, m_fFc, ecr, ac);
+		double dc = GetDc(ee, m_fEc, m_fFc, ecr, ac);
 		ss = GetSigmaC(ee, dc, m_fEc);
 
 		e[i] = ee;

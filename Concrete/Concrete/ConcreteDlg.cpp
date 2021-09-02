@@ -51,6 +51,8 @@ END_MESSAGE_MAP()
 
 CConcreteDlg::CConcreteDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CONCRETE_DIALOG, pParent)
+	, m_fFc(20.10f)
+	, m_fEc(3.0e4f)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -58,12 +60,18 @@ CConcreteDlg::CConcreteDlg(CWnd* pParent /*=nullptr*/)
 void CConcreteDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT_FC, m_fFc);
+	DDV_MinMaxFloat(pDX, m_fFc, 0, FLT_MAX);
+	DDX_Text(pDX, IDC_EDIT_EC, m_fEc);
+	DDV_MinMaxFloat(pDX, m_fEc, 0, FLT_MAX);
+	DDX_Control(pDX, IDC_CUSTOM1, m_ChartCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CConcreteDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_PLOT, &CConcreteDlg::OnBnClickedButtonPlot)
 END_MESSAGE_MAP()
 
 
@@ -152,3 +160,81 @@ HCURSOR CConcreteDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+float CConcreteDlg::GetDc(float e, float Ec, float fcr, float ecr, float ac)
+{
+	float dc = 0.f;
+
+	float pc = fcr / Ec / ecr;
+	float n = Ec * ecr / (Ec*ecr - fcr);
+	float x = e / ecr;
+
+	if (x <= 1.f)
+	{
+		dc = 1 - pc * n / (n - 1 + pow(x, n));
+	}
+	else
+	{
+		dc = 1 - pc / (ac*(x - 1)*(x - 1) + x);
+	}
+	return dc;
+}
+float CConcreteDlg::GetSigmaC(float e, float dc, float Ec)
+{
+	float sigma = (1 - dc)*Ec*e;
+	return sigma;
+}
+
+void CConcreteDlg::OnBnClickedButtonPlot()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int N = 100;
+	double de = 0.0001f;
+	double ee = 0, ss = 0;
+
+	double* e = new double[N];
+	double* s = new double[N];
+
+
+	for (int i = 0; i < N; i++)
+	{
+		ee = i * de;
+		float dc = GetDc(ee, m_fEc, m_fFc, ecr, ac);
+		ss = GetSigmaC(ee, dc, m_fEc);
+
+		e[i] = ee;
+		s[i] = ss;
+	}
+
+	//清空曲线
+	m_ChartCtrl.RemoveAllSeries();
+	m_ChartCtrl.GetTitle()->RemoveAll();
+
+	CChartAxis *pAxis = NULL;
+	pAxis = m_ChartCtrl.CreateStandardAxis(CChartCtrl::BottomAxis);
+	pAxis->SetAutomatic(true);
+	pAxis = m_ChartCtrl.CreateStandardAxis(CChartCtrl::LeftAxis);
+	pAxis->SetAutomatic(true);
+
+	//背景颜色
+	m_ChartCtrl.SetBackColor(RGB(255, 255, 255));
+
+	//图标标题
+	//m_ChartCtrl.GetTitle()->AddString(_T("P-M1"));
+
+	//坐标轴标题
+	m_ChartCtrl.GetBottomAxis()->GetLabel()->SetText(_T("e"));
+	m_ChartCtrl.GetLeftAxis()->GetLabel()->SetText(_T("sigma"));
+
+	CChartLineSerie* pLineSerie = m_ChartCtrl.CreateLineSerie();
+	pLineSerie->SetSeriesOrdering(poNoOrdering);//设置为无序
+	pLineSerie->SetPoints(e, s, N);
+	pLineSerie->SetWidth(1);
+	pLineSerie->SetColor(RGB(0, 255, 0));
+	//pLineSerie->SetName(name);
+
+	//pPMx1->uSerieId = pLineSerie1->GetSerieId();
+	m_ChartCtrl.EnableRefresh(true);
+
+	delete[]e, s;
+
+}

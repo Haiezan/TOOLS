@@ -65,6 +65,7 @@ void CConcreteDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_EC, m_fEc);
 	DDV_MinMaxFloat(pDX, m_fEc, 0, FLT_MAX);
 	DDX_Control(pDX, IDC_CUSTOM1, m_ChartCtrl);
+	DDX_Control(pDX, IDC_CUSTOM_TABLE, m_GridCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CConcreteDlg, CDialogEx)
@@ -205,6 +206,8 @@ void CConcreteDlg::OnBnClickedButtonPlot()
 		s[i] = ss;
 	}
 
+	////绘制曲线
+
 	//清空曲线
 	m_ChartCtrl.RemoveAllSeries();
 	m_ChartCtrl.GetTitle()->RemoveAll();
@@ -234,6 +237,26 @@ void CConcreteDlg::OnBnClickedButtonPlot()
 
 	//pPMx1->uSerieId = pLineSerie1->GetSerieId();
 	m_ChartCtrl.EnableRefresh(true);
+
+
+
+	////显示表格
+	m_GridCtrl.SetColumnCount(2);
+	m_GridCtrl.SetRowCount(N + 1);
+	//重新定义第一列
+	m_GridCtrl.SetItemText(0, 0, L"e");
+	m_GridCtrl.SetItemText(0, 1, L"sigma");
+	m_GridCtrl.SetFixedRowCount(1);
+	for (int i = 0; i < N; i++)
+	{
+		CString str1,str2;
+		str1.Format(_T("%f"), e[i]);
+		str2.Format(_T("%f"), s[i]);
+		m_GridCtrl.SetItemText(i + 1, 0, str1);
+		m_GridCtrl.SetItemText(i + 1, 1, str2);
+	}
+	m_GridCtrl.AutoSize();
+
 
 	delete[]e, s;
 

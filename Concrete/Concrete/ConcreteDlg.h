@@ -7,6 +7,7 @@
 #include "ChartCtrl/ChartAxisLabel.h"
 #include "ChartCtrl/ChartLineSerie.h"
 #include "ChartCtrl/ChartPointsSerie.h"
+#include "GridCtrl_src/GridCtrl.h"
 
 // CConcreteDlg 对话框
 class CConcreteDlg : public CDialogEx
@@ -48,4 +49,5 @@ public:
 	double GetSigmaC(double e, double dc, double Ec);
 	afx_msg void OnBnClickedButtonPlot();
 	CChartCtrl m_ChartCtrl;
+	CGridCtrl m_GridCtrl;
 };

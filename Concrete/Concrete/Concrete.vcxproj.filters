@@ -16,6 +16,9 @@
     <Filter Include="ChartCtrl">
       <UniqueIdentifier>{f296244d-0a06-411a-8a08-c465d82800cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GridCtrl_src">
+      <UniqueIdentifier>{e3d89846-7d03-4f34-9f3f-211934af0e67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Concrete.h">
@@ -126,6 +129,48 @@
     <ClInclude Include="ChartCtrl\PointsOrdering.h">
       <Filter>ChartCtrl</Filter>
     </ClInclude>
+    <ClInclude Include="GridCtrl_src\CellRange.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCell.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellBase.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellCheck.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellCombo.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellDateTime.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCellNumeric.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridCtrl.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridDropTarget.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\GridURLCell.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\InPlaceEdit.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\MemDC.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\StdAfx.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
+    <ClInclude Include="GridCtrl_src\TitleTip.h">
+      <Filter>GridCtrl_src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Concrete.cpp">
@@ -205,6 +250,42 @@
     </ClCompile>
     <ClCompile Include="ChartCtrl\ChartXYSerie.cpp">
       <Filter>ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCell.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellBase.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellCheck.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellCombo.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellDateTime.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCellNumeric.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridCtrl.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridDropTarget.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\GridURLCell.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\InPlaceEdit.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\StdAfx.cpp">
+      <Filter>GridCtrl_src</Filter>
+    </ClCompile>
+    <ClCompile Include="GridCtrl_src\TitleTip.cpp">
+      <Filter>GridCtrl_src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

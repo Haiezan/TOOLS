@@ -114,6 +114,7 @@ BOOL CModelMasterDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	GetConfig();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -167,12 +168,33 @@ HCURSOR CModelMasterDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CModelMasterDlg::GetConfig()
+{
+	//配置文件
+	sIni = "";
+	::GetCurrentDirectory(256, sIni.GetBuffer(256)); //获取当前文件路径
+	sIni.ReleaseBuffer();
+	sIni += L"\\Config.ini";
+	CFile file(sIni, CFile::modeCreate);
+	file.Close();
+
+	::GetPrivateProfileString("Path", "Directory", "0", m_sPath.GetBuffer(200), 200, sIni);
+	::GetPrivateProfileString("Path", "SAUSG", "0", m_sSoftwSSG.GetBuffer(200), 200, sIni);
+}
+void CModelMasterDlg::WriteConfig()
+{
+	::WritePrivateProfileString("Path", "Directory", m_sPath, sIni);
+	::WritePrivateProfileString("Path", "SAUSG", m_sSoftwSSG, sIni);
+}
 
 void CModelMasterDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	m_ProjectList.clear();
 	UpdateData();
+	WriteConfig();
+
+	m_ProjectList.clear();
+	
 	ScanFile(m_sPath);
 	ShowTree();
 
@@ -182,6 +204,7 @@ void CModelMasterDlg::OnBnClickedButton1()
 
 void CModelMasterDlg::ScanFile(CString Dir)
 {
+
 	CFileFind finder;
 	CString Add = "\\*";
 	CString DirSpec = Dir + Add;                        //补全要遍历的文件夹的目录
@@ -521,6 +544,8 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 			}
 		}
 	}
+
+	
 
 	fclose(fd);
 

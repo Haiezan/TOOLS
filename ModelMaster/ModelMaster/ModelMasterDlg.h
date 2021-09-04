@@ -33,6 +33,16 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
+private:
+	//配置文件
+	CString sIni;
+	void GetConfig();
+	void WriteConfig();
+
+	//软件路径
+	CString m_sSoftwSSG;
+
 public:
 	CString m_sPath;
 	afx_msg void OnBnClickedButtonPath();

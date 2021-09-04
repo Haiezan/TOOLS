@@ -79,6 +79,7 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_COMMAND(ID_RIGHT_OPEN, &CModelMasterDlg::OnRightOpen)
 	ON_COMMAND(ID_RIGHT_TXT, &CModelMasterDlg::OnRightTxt)
 	ON_BN_CLICKED(IDC_BUTTON_WRITE, &CModelMasterDlg::OnBnClickedButtonWrite)
+	ON_BN_CLICKED(IDC_BUTTON_CONFIG, &CModelMasterDlg::OnBnClickedButtonConfig)
 END_MESSAGE_MAP()
 
 
@@ -175,7 +176,7 @@ void CModelMasterDlg::GetConfig()
 	::GetCurrentDirectory(256, sIni.GetBuffer(256)); //获取当前文件路径
 	sIni.ReleaseBuffer();
 	sIni += L"\\Config.ini";
-	CFile file(sIni, CFile::modeCreate);
+	CFile file(sIni, CFile::modeCreate | CFile::modeNoTruncate);
 	file.Close();
 
 	::GetPrivateProfileString("Path", "Directory", "0", m_sPath.GetBuffer(200), 200, sIni);
@@ -502,7 +503,7 @@ void CModelMasterDlg::OnRightOpen()
 	CString str;
 	if (strcmp(file.Ext, "ssg") == 0)
 	{
-		CString exe = "D:\\Program Files\\SAUSG2021\\sausage.exe";
+		CString exe = m_sSoftwSSG;
 		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, file.FilePath);
 	}
 
@@ -550,4 +551,26 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 	fclose(fd);
 
 
+}
+
+// 打开配置对话框
+#include "ConfigDlg.h"
+void CModelMasterDlg::OnBnClickedButtonConfig()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CConfigDlg dlg;
+	dlg.m_sSausg = m_sSoftwSSG;
+	INT_PTR nRes;
+	nRes = dlg.DoModal();
+
+	if (IDOK == nRes)
+	{
+		m_sSoftwSSG = dlg.m_sSausg;
+
+		WriteConfig();  //写入配置文件
+	}
+	else
+	{
+		return;
+	}
 }

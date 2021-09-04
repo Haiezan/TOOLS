@@ -66,4 +66,5 @@ public:
 
 	CFileInfo GetFileInfo(HTREEITEM m_hCurItem);
 	afx_msg void OnBnClickedButtonWrite();
+	afx_msg void OnBnClickedButtonConfig();
 };

@@ -42,6 +42,9 @@
     <ClInclude Include="ReadFile.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModelMaster.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ReadALine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

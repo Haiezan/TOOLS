@@ -501,7 +501,7 @@ void CModelMasterDlg::OnRightOpen()
 	CFileInfo file = GetFileInfo(m_hCurItem);
 
 	CString str;
-	if (strcmp(file.Ext, "ssg") == 0)
+	if ((strcmp(file.Ext, "ssg") == 0) || (strcmp(file.Ext, "SSG") == 0))
 	{
 		CString exe = m_sSoftwSSG;
 		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, file.FilePath);

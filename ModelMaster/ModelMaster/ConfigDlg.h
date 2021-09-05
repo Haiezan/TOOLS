@@ -24,4 +24,5 @@ public:
 	// SAUSG软件路径
 	CString m_sSausg;
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnBnClickedButton1();
 };

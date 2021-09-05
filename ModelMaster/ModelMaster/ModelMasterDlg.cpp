@@ -414,35 +414,14 @@ void CModelMasterDlg::OnBnClickedButtonBackup()
 	}
 }
 
-
+#include"Browse.h"
 void CModelMasterDlg::OnBnClickedButtonPath()
 {
 	// TODO: 在此添加控件通知处理程序代码
 
-	// 获取特定文件夹的LPITEMIDLIST，可以将之理解为HANDLE
-	// 所谓的特定文件夹,你可以用CSIDL_XXX来检索之。
-	LPITEMIDLIST rootLoation;
-	SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOP, &rootLoation);
-	if (rootLoation == NULL) {
-		// unkown error
-		return;
-	}
-	// 配置对话框
-	BROWSEINFO bi;
-	ZeroMemory(&bi, sizeof(bi));
-	bi.pidlRoot = rootLoation; // 文件夹对话框之根目录，不指定的话则为我的电脑
-	bi.lpszTitle = _T("选择备份目录"); // 可以不指定
-	// bi.ulFlags = BIF_EDITBOX | BIF_RETURNONLYFSDIRS;
-
-	// 打开对话框, 有点像DoModal
-	LPITEMIDLIST targetLocation = SHBrowseForFolder(&bi);
-	if (targetLocation != NULL) {
-		TCHAR targetPath[MAX_PATH];
-		SHGetPathFromIDList(targetLocation, targetPath);
-
-		m_sPath = targetPath;
-		UpdateData(FALSE);
-	}
+	m_sPath = BrowseDirectory();
+	UpdateData(FALSE);
+	
 }
 
 
@@ -554,7 +533,7 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 }
 
 // 打开配置对话框
-#include "ConfigDlg.h"
+
 void CModelMasterDlg::OnBnClickedButtonConfig()
 {
 	// TODO: 在此添加控件通知处理程序代码

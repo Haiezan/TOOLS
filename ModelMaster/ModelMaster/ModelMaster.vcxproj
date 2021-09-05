@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Browse.h" />
     <ClInclude Include="ConfigDlg.h" />
     <ClInclude Include="FileInfo.h" />
     <ClInclude Include="ModelMaster.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Browse.cpp" />
     <ClCompile Include="ConfigDlg.cpp" />
     <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="ModelMaster.cpp" />

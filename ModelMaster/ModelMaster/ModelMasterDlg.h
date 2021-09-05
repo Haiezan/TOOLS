@@ -3,6 +3,8 @@
 //
 #include <vector>
 #include"Project.h"
+#include "ConfigDlg.h"
+
 #pragma once
 
 using namespace std;

@@ -181,6 +181,8 @@ void CModelMasterDlg::GetConfig()
 
 	::GetPrivateProfileString("Path", "Directory", "0", m_sPath.GetBuffer(200), 200, sIni);
 	::GetPrivateProfileString("Path", "SAUSG", "0", m_sSoftwSSG.GetBuffer(200), 200, sIni);
+
+	UpdateData(FALSE);
 }
 void CModelMasterDlg::WriteConfig()
 {
@@ -511,7 +513,7 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
 		{
 			CFileInfo* pfile = &m_ProjectList[i].FileList[j];
-			if (strcmp(pfile->Ext, "ssg") == 0)
+			if ((strcmp(pfile->Ext, "ssg") == 0) || (strcmp(pfile->Ext, "SSG") == 0))
 			{
 				ReadSSGFile(pfile);
 				fprintf(fd, "%s,%s,%f,%f,%f,%f,%f,%f,%f\n", m_ProjectList[i].sName,pfile->FileTitle, pfile->BuInfo[0], pfile->BuInfo[1], pfile->BuInfo[2], pfile->BuInfo[3], pfile->BuInfo[4], pfile->BuInfo[5], pfile->BuInfo[6]);
@@ -519,11 +521,14 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 		}
 	}
 
-	
-
 	fclose(fd);
 
+	int ichoice = MessageBox("项目信息汇总完成！是否打开汇总文件？", "项目信息", MB_OKCANCEL);
 
+	if (ichoice == 1)
+	{
+		ShellExecute(nullptr, _T("open"), "info.csv", _T(""), _T(""), SW_SHOW);
+	}
 }
 
 // 打开配置对话框

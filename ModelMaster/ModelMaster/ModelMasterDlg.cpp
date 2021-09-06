@@ -484,26 +484,20 @@ void CModelMasterDlg::OnRightOpen()
 	{
 		CString exe = m_sSoftwSSG;
 		str.Format("%s TYPE=OPEN PATH=\"%s\"", exe, file.FilePath);
+		file.OpenFile(str);
 	}
-
-	file.OpenFile(str);
+	else
+	{
+		ShellExecute(nullptr, _T("open"), file.FilePath, _T(""), _T(""), SW_SHOW);
+	}
 }
 
 
 void CModelMasterDlg::OnRightTxt()
 {
-	
-
-
 	// TODO: 在此添加命令处理程序代码
 	CFileInfo file = GetFileInfo(m_hCurItem);
-
-
-	ReadSSGFile(&file);
-
-	CString str;
-	str.Format("notepad %s", file.FilePath);
-	file.OpenFile(str);
+	ShellExecute(nullptr, _T("open"), file.FilePath, _T(""), _T(""), SW_SHOW);
 }
 
 

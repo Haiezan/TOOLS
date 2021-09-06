@@ -52,7 +52,7 @@ END_MESSAGE_MAP()
 
 CModelMasterDlg::CModelMasterDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MODELMASTER_DIALOG, pParent)
-	, m_sPath(_T("D:\\04 Support"))
+	, m_sPath(_T("D:\\"))
 	, m_sTargetExt(_T(".ssg,.SSG,.yjk,.jws,.JWS,.rar,.zip"))
 	, m_iFileTime(0)
 {
@@ -179,13 +179,15 @@ void CModelMasterDlg::GetConfig()
 	CFile file(sIni, CFile::modeCreate | CFile::modeNoTruncate);
 	file.Close();
 
-	::GetPrivateProfileString("Path", "Directory", "0", m_sPath.GetBuffer(200), 200, sIni);
-	::GetPrivateProfileString("Path", "SAUSG", "0", m_sSoftwSSG.GetBuffer(200), 200, sIni);
+	::GetPrivateProfileString("Ext", "TargetExt", m_sTargetExt, m_sTargetExt.GetBuffer(200), 200, sIni);
+	::GetPrivateProfileString("Path", "Directory", m_sPath, m_sPath.GetBuffer(200), 200, sIni);
+	::GetPrivateProfileString("Path", "SAUSG", m_sSoftwSSG, m_sSoftwSSG.GetBuffer(200), 200, sIni);
 
 	UpdateData(FALSE);
 }
 void CModelMasterDlg::WriteConfig()
 {
+	::WritePrivateProfileString("Ext", "TargetExt", m_sTargetExt, sIni);
 	::WritePrivateProfileString("Path", "Directory", m_sPath, sIni);
 	::WritePrivateProfileString("Path", "SAUSG", m_sSoftwSSG, sIni);
 }

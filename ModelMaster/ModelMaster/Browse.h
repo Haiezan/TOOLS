@@ -5,4 +5,4 @@
 CString BrowseFile();
 
 //浏览获取文件夹路径
-CString BrowseDirectory();
+CString BrowseDirectory(CString m_sPath);

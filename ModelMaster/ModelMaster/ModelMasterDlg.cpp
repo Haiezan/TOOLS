@@ -80,6 +80,7 @@ BEGIN_MESSAGE_MAP(CModelMasterDlg, CDialogEx)
 	ON_COMMAND(ID_RIGHT_TXT, &CModelMasterDlg::OnRightTxt)
 	ON_BN_CLICKED(IDC_BUTTON_WRITE, &CModelMasterDlg::OnBnClickedButtonWrite)
 	ON_BN_CLICKED(IDC_BUTTON_CONFIG, &CModelMasterDlg::OnBnClickedButtonConfig)
+	ON_COMMAND(ID_RIGHT_PATH, &CModelMasterDlg::OnRightPath)
 END_MESSAGE_MAP()
 
 
@@ -423,7 +424,7 @@ void CModelMasterDlg::OnBnClickedButtonPath()
 {
 	// TODO: 在此添加控件通知处理程序代码
 
-	m_sPath = BrowseDirectory();
+	m_sPath = BrowseDirectory(m_sPath);
 	UpdateData(FALSE);
 	
 }
@@ -504,6 +505,13 @@ void CModelMasterDlg::OnRightTxt()
 	ShellExecute(nullptr, _T("open"), file.FilePath, _T(""), _T(""), SW_SHOW);
 }
 
+void CModelMasterDlg::OnRightPath()
+{
+	// TODO: 在此添加命令处理程序代码
+	CFileInfo file = GetFileInfo(m_hCurItem);
+	ShellExecute(nullptr, _T("open"), file.Root, _T(""), _T(""), SW_SHOW);
+
+}
 
 void CModelMasterDlg::OnBnClickedButtonWrite()
 {
@@ -554,3 +562,6 @@ void CModelMasterDlg::OnBnClickedButtonConfig()
 		return;
 	}
 }
+
+
+

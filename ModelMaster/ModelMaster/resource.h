@@ -12,7 +12,6 @@
 #define IDC_EDIT_PATH                   1000
 #define IDC_BUTTON1                     1001
 #define IDC_TREE1                       1002
-#define IDC_BUTTON2                     1002
 #define IDC_EDIT_EXT                    1003
 #define IDC_BUTTON_BACKUP               1004
 #define IDC_BUTTON_PATH                 1005
@@ -26,13 +25,15 @@
 #define ID_32773                        32773
 #define ID_RIGHT_OPEN                   32774
 #define ID_RIGHT_TXT                    32775
+#define ID_32776                        32776
+#define ID_RIGHT_PATH                   32777
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32776
+#define _APS_NEXT_COMMAND_VALUE         32778
 #define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

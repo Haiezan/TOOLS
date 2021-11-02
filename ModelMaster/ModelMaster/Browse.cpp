@@ -22,7 +22,7 @@ CString BrowseFile()
 }
 
 //浏览获取文件夹路径
-CString BrowseDirectory()
+CString BrowseDirectory(CString m_sPath)
 {
 	TCHAR targetPath[MAX_PATH];
 
@@ -46,7 +46,8 @@ CString BrowseDirectory()
 	if (targetLocation != NULL) {
 
 		SHGetPathFromIDList(targetLocation, targetPath);
+		return targetPath;
 	}
 
-	return targetPath;
+	return m_sPath;
 }

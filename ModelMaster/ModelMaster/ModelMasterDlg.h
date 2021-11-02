@@ -62,10 +62,10 @@ public:
 	int m_iFileTime;
 	afx_msg void OnNMRClickTree1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnRightOpen();
+	afx_msg void OnRightTxt();
+	afx_msg void OnRightPath();
 
 	HTREEITEM m_hCurItem;
-	afx_msg void OnRightTxt();
-
 	CFileInfo GetFileInfo(HTREEITEM m_hCurItem);
 	afx_msg void OnBnClickedButtonWrite();
 	afx_msg void OnBnClickedButtonConfig();

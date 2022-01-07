@@ -516,26 +516,37 @@ void CModelMasterDlg::OnRightPath()
 void CModelMasterDlg::OnBnClickedButtonWrite()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	BOOL bFlag = FALSE;
+
+	if (MessageBox("是否去重？", "提示", MB_YESNO | MB_ICONEXCLAMATION) == IDOK)
+		bFlag = TRUE;
+
 	FILE* fd = fopen("info.csv","w");
 	fprintf(fd, "项目名称,文件名称,设防类别,场地类别,场地分组,地震烈度,层数,地下室层数,高度\n");
+
+	
 	for (int i = 0; i < m_ProjectList.size(); i++)
 	{
+		CFileInfo* pfileold = &m_ProjectList[i].FileList[0];
 		for (int j = 0; j < m_ProjectList[i].FileList.size(); j++)
 		{
 			CFileInfo* pfile = &m_ProjectList[i].FileList[j];
 			if ((strcmp(pfile->Ext, "ssg") == 0) || (strcmp(pfile->Ext, "SSG") == 0))
 			{
 				ReadSSGFile(pfile);
+
+				//相同模型不再重复输出
+				if (j != 0 && bFlag&&abs(pfile->BuInfo[6] - pfileold->BuInfo[6]) < 0.1f) continue;
+
 				fprintf(fd, "%s,%s,%f,%f,%f,%f,%f,%f,%f\n", m_ProjectList[i].sName,pfile->FileTitle, pfile->BuInfo[0], pfile->BuInfo[1], pfile->BuInfo[2], pfile->BuInfo[3], pfile->BuInfo[4], pfile->BuInfo[5], pfile->BuInfo[6]);
+				pfileold = pfile;
 			}
 		}
 	}
 
 	fclose(fd);
 
-	int ichoice = MessageBox("项目信息汇总完成！是否打开汇总文件？", "项目信息", MB_OKCANCEL);
-
-	if (ichoice == 1)
+	if (MessageBox("项目信息汇总完成！是否打开汇总文件？", "项目信息", MB_OKCANCEL) == IDOK)
 	{
 		ShellExecute(nullptr, _T("open"), "info.csv", _T(""), _T(""), SW_SHOW);
 	}

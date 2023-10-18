@@ -17,6 +17,18 @@
 #define IDC_CHECK_U2                    1006
 #define IDC_EDIT_K2                     1007
 #define IDC_EDIT_C2                     1008
+#define IDC_CHECK_U3                    1009
+#define IDC_EDIT_K3                     1010
+#define IDC_EDIT_C3                     1011
+#define IDC_CHECK_U4                    1012
+#define IDC_EDIT_K4                     1013
+#define IDC_EDIT_C4                     1014
+#define IDC_CHECK_U5                    1015
+#define IDC_EDIT_K5                     1016
+#define IDC_EDIT_C5                     1017
+#define IDC_CHECK_U6                    1018
+#define IDC_EDIT_K6                     1019
+#define IDC_EDIT_C6                     1020
 
 // Next default values for new objects
 // 

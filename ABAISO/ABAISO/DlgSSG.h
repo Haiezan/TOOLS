@@ -21,7 +21,11 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	BOOL m_bU1;
-	float m_fK1;
-	float m_fC1;
+	BOOL m_bU[6];
+	float m_fK[6], m_fC[6];
+	BOOL m_bUN[6];
+	float m_fNL[8];
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedCheck();
+	afx_msg void OnBnClickedButtonUn1();
 };

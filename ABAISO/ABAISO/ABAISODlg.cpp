@@ -60,6 +60,7 @@ CABAISODlg::CABAISODlg(CWnd* pParent /*=nullptr*/)
 CABAISODlg::~CABAISODlg()
 {
 	if (m_pDlgSSG != NULL) delete m_pDlgSSG;
+	if (m_pDlgABA != NULL) delete m_pDlgABA;
 }
 
 void CABAISODlg::DoDataExchange(CDataExchange* pDX)
@@ -73,6 +74,7 @@ BEGIN_MESSAGE_MAP(CABAISODlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CABAISODlg::OnTcnSelchangeTab)
 END_MESSAGE_MAP()
 
 
@@ -120,20 +122,27 @@ BOOL CABAISODlg::OnInitDialog()
 
 	m_cTab.InsertItem(0, L"SAUSG");
 	m_cTab.InsertItem(1, L"ABAQUS");
+	m_cTab.SetCurSel(0);
 
 	if (m_pDlgSSG == NULL)
 	{
 		m_pDlgSSG = new CDlgSSG();
 		m_pDlgSSG->Create(IDD_DIALOG_SSG, this);
 		
-
 		CRect rectDlg;
 		m_pDlgSSG->GetWindowRect(&rectDlg);
 		m_pDlgSSG->MoveWindow(rect.left, rect.top, rect.Width(), rect.Height());
-		m_pDlgSSG->ShowWindow(SW_SHOW);
 	}
+	if (m_pDlgABA == NULL)
+	{
+		m_pDlgABA = new CDlgABA();
+		m_pDlgABA->Create(IDD_DIALOG_ABA, this);
 
-
+		CRect rectDlg;
+		m_pDlgABA->GetWindowRect(&rectDlg);
+		m_pDlgABA->MoveWindow(rect.left, rect.top, rect.Width(), rect.Height());
+	}
+	ViewDlg();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -186,3 +195,24 @@ HCURSOR CABAISODlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CABAISODlg::OnTcnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	ViewDlg();
+	*pResult = 0;
+}
+void CABAISODlg::ViewDlg()
+{
+	int iSel = m_cTab.GetCurSel();
+	if (iSel == 0)
+	{
+		m_pDlgSSG->ShowWindow(SW_SHOW);
+		m_pDlgABA->ShowWindow(SW_HIDE);
+	}
+	else if (iSel == 1)
+	{
+		m_pDlgSSG->ShowWindow(SW_HIDE);
+		m_pDlgABA->ShowWindow(SW_SHOW);
+	}
+}

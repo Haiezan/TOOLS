@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="ABAISO.h" />
     <ClInclude Include="ABAISODlg.h" />
+    <ClInclude Include="DlgABA.h" />
     <ClInclude Include="DlgNL1.h" />
     <ClInclude Include="DlgNL2.h" />
     <ClInclude Include="DlgSSG.h" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClCompile Include="ABAISO.cpp" />
     <ClCompile Include="ABAISODlg.cpp" />
+    <ClCompile Include="DlgABA.cpp" />
     <ClCompile Include="DlgNL1.cpp" />
     <ClCompile Include="DlgNL2.cpp" />
     <ClCompile Include="DlgSSG.cpp" />

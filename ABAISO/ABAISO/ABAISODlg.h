@@ -4,6 +4,7 @@
 
 #pragma once
 #include "DlgSSG.h"
+#include "DlgABA.h"
 
 // CABAISODlg 对话框
 class CABAISODlg : public CDialogEx
@@ -35,7 +36,10 @@ public:
 	CTabCtrl m_cTab;
 
 	CDlgSSG* m_pDlgSSG;
+	CDlgABA* m_pDlgABA;
 	CStatic m_cGroup;
 	CRect m_cGroupRect;
 	CRect m_cDlgRect;
+	afx_msg void OnTcnSelchangeTab(NMHDR* pNMHDR, LRESULT* pResult);
+	void ViewDlg();
 };

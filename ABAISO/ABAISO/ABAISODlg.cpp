@@ -57,6 +57,10 @@ CABAISODlg::CABAISODlg(CWnd* pParent /*=nullptr*/)
 
 	m_pDlgSSG = NULL;
 }
+CABAISODlg::~CABAISODlg()
+{
+	if (m_pDlgSSG != NULL) delete m_pDlgSSG;
+}
 
 void CABAISODlg::DoDataExchange(CDataExchange* pDX)
 {

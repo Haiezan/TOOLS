@@ -21,6 +21,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	CString m_sName;
 	BOOL m_bU[6];
 	float m_fK[6], m_fC[6];
 	BOOL m_bUN[6];
@@ -28,4 +29,7 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedCheck();
 	afx_msg void OnBnClickedButtonUn1();
+	afx_msg void OnBnClickedButtonUn2();
+	afx_msg void OnBnClickedButtonUn3();
+	void SetData();
 };

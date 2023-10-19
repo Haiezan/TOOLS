@@ -9,6 +9,7 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_SSG                  130
 #define IDD_DIALOG_NL1                  132
+#define IDD_DIALOG_NL2                  134
 #define IDC_TAB1                        1000
 #define IDC_STATIC_PANEL                1001
 #define IDC_EDIT_NAME                   1002
@@ -42,6 +43,7 @@
 #define IDC_BUTTON_UN3                  1029
 #define IDC_EDIT2                       1029
 #define IDC_BUTTON_UN4                  1030
+#define IDC_EDIT3                       1030
 #define IDC_BUTTON_UN5                  1031
 #define IDC_BUTTON_UN6                  1032
 
@@ -49,7 +51,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           101

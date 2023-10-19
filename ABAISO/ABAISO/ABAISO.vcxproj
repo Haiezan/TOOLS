@@ -186,6 +186,7 @@
     <ClInclude Include="ABAISO.h" />
     <ClInclude Include="ABAISODlg.h" />
     <ClInclude Include="DlgNL1.h" />
+    <ClInclude Include="DlgNL2.h" />
     <ClInclude Include="DlgSSG.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="ABAISO.cpp" />
     <ClCompile Include="ABAISODlg.cpp" />
     <ClCompile Include="DlgNL1.cpp" />
+    <ClCompile Include="DlgNL2.cpp" />
     <ClCompile Include="DlgSSG.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

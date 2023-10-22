@@ -13,8 +13,8 @@ IMPLEMENT_DYNAMIC(CDlgABA, CDialogEx)
 
 CDlgABA::CDlgABA(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG_ABA, pParent)
-	, m_sNote(_T(""))
-	, m_bLinear(FALSE)
+	, m_bHard1(FALSE)
+	, m_bHard2(FALSE)
 {
 
 }
@@ -30,6 +30,11 @@ void CDlgABA::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC_NOTE, m_sNote);
 	DDX_Radio(pDX, IDC_RADIO_LINEAR, m_bLinear);
 	DDX_Control(pDX, IDC_LIST2, m_cListData);
+	DDX_Check(pDX, IDC_CHECK_F1, m_bU[0]);
+	DDX_Check(pDX, IDC_CHECK_F2, m_bU[1]);
+	DDX_Check(pDX, IDC_CHECK_F3, m_bU[2]);
+	DDX_Check(pDX, IDC_CHECK_HARD1, m_bHard1);
+	DDX_Check(pDX, IDC_CHECK_HARD2, m_bHard2);
 }
 
 
@@ -69,35 +74,66 @@ void CDlgABA::OnLbnSelchangeList1()
 	int iSel = m_cList.GetCurSel();
 	m_cList.GetText(iSel, m_sNote);
 
+	//清空表格数据
 	m_cListData.DeleteAllItems();
-	m_cListData.DeleteColumn(1);
-	m_cListData.DeleteColumn(2);
-	m_cListData.DeleteColumn(3);
-	m_cListData.DeleteColumn(4);
-	//int aa = m_cListData.GetItemCount();
-	/*for (int i = 0; i < m_cListData.GetItemCount(); i++)
-	{
-
-	}*/
-
-	//m_cListData.ModifyStyle(0, LVS_REPORT);               // 报表模式  
-	//m_cListData.SetExtendedStyle(m_cListData.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-
-	//1、初始化列表样式。参数为：整行选择、网格线
+	for (int i = 0; i < 4; i++) m_cListData.DeleteColumn(0);
+	//初始化列表样式。参数为：整行选择、网格线
 	m_cListData.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
-	//2、建立表头，即为每列起名字。注意列是从1开始
-	m_cListData.InsertColumn(1, L"", LVCFMT_CENTER, 50);
-	m_cListData.InsertColumn(2, L"D11", LVCFMT_CENTER, 50);
-	m_cListData.InsertColumn(3, L"D22", LVCFMT_CENTER, 50);
-	m_cListData.InsertColumn(4, L"D33", LVCFMT_CENTER, 50);
+	//弹性参数
+	if (m_sNote == L"Elasticity")
+	{
+		m_bLinear = TRUE;
+		memcpy(m_bU, m_ISO.m_bU, 6 * sizeof(BOOL));
 
-	//3、先创建行，再为改行每列赋值。注意列是从0开始
-	m_cListData.InsertItem(0, L"1");
-	//m_cListData.SetItemText(0, 0, L"1");
-	m_cListData.SetItemText(0, 1, L"0.3");
-	m_cListData.SetItemText(0, 2, L"0.4");
-	m_cListData.SetItemText(0, 3, L"0.4");
+		//建立表头，即为每列起名字。注意列是从1开始
+		m_cListData.InsertColumn(1, L"", LVCFMT_CENTER, 30);
+		m_cListData.InsertColumn(2, L"D11", LVCFMT_CENTER, 100);
+		m_cListData.InsertColumn(3, L"D22", LVCFMT_CENTER, 100);
+		m_cListData.InsertColumn(4, L"D33", LVCFMT_CENTER, 100);
+
+		//先创建行，再为改行每列赋值。注意列是从0开始
+		CString str;
+		m_cListData.InsertItem(0, L"1");
+		//m_cListData.SetItemText(0, 0, L"1");
+		str.Format(L"%g", m_ISO.m_fK[1]);
+		m_cListData.SetItemText(0, 1, str);
+		str.Format(L"%g", m_ISO.m_fK[2]);
+		m_cListData.SetItemText(0, 2, str);
+		str.Format(L"%g", m_ISO.m_fK[0]);
+		m_cListData.SetItemText(0, 3, str);
+	}
+	else if (m_sNote == L"Plasticity")
+	{
+		m_bLinear = FALSE;
+		memset(m_bU, 0, 6 * sizeof(BOOL));
+		m_bU[0] = m_ISO.m_bUN[1];
+		m_bU[1] = m_ISO.m_bUN[2];
+
+		m_bHard1 = TRUE;
+		m_bHard2 = FALSE;
+
+		//建立表头，即为每列起名字。注意列是从1开始
+		m_cListData.InsertColumn(1, L"", LVCFMT_CENTER, 30);
+		m_cListData.InsertColumn(2, L"Yield Force//Moment", LVCFMT_CENTER, 100);
+		m_cListData.InsertColumn(3, L"Plastic Motion", LVCFMT_CENTER, 100);
+		m_cListData.InsertColumn(4, L"Rate", LVCFMT_CENTER, 100);
+
+		//先创建行，再为改行每列赋值。注意列是从0开始
+		CString str;
+		m_cListData.InsertItem(0, L"1");
+		//m_cListData.SetItemText(0, 0, L"1");
+		str.Format(L"%g", m_ISO.m_fK[1]);
+		m_cListData.SetItemText(0, 1, str);
+		str.Format(L"%g", m_ISO.m_fK[2]);
+		m_cListData.SetItemText(0, 2, str);
+		str.Format(L"%g", m_ISO.m_fK[0]);
+		m_cListData.SetItemText(0, 3, str);
+
+	}
+	
+
+	
 
 	UpdateData(FALSE);
 }

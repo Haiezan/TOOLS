@@ -33,4 +33,9 @@ public:
 	BOOL m_bLinear;
 	
 
+	BOOL m_bU[6];
+	// 各向同性强化
+	BOOL m_bHard1;
+	// 随动强化
+	BOOL m_bHard2;
 };

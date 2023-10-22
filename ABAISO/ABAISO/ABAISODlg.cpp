@@ -122,7 +122,7 @@ BOOL CABAISODlg::OnInitDialog()
 
 	m_cTab.InsertItem(0, L"SAUSG");
 	m_cTab.InsertItem(1, L"ABAQUS");
-	m_cTab.SetCurSel(0);
+	m_cTab.SetCurSel(1);
 
 	if (m_pDlgSSG == NULL)
 	{

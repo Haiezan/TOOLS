@@ -45,6 +45,9 @@
     <ClInclude Include="DlgABA.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ISO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ABAISO.cpp">

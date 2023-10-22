@@ -128,6 +128,7 @@ BOOL CABAISODlg::OnInitDialog()
 	{
 		m_pDlgSSG = new CDlgSSG();
 		m_pDlgSSG->Create(IDD_DIALOG_SSG, this);
+		m_pDlgSSG->m_ISO = m_ISO;
 		
 		CRect rectDlg;
 		m_pDlgSSG->GetWindowRect(&rectDlg);
@@ -137,6 +138,7 @@ BOOL CABAISODlg::OnInitDialog()
 	{
 		m_pDlgABA = new CDlgABA();
 		m_pDlgABA->Create(IDD_DIALOG_ABA, this);
+		m_pDlgABA->m_ISO = m_ISO;
 
 		CRect rectDlg;
 		m_pDlgABA->GetWindowRect(&rectDlg);
@@ -212,7 +214,11 @@ void CABAISODlg::ViewDlg()
 	}
 	else if (iSel == 1)
 	{
+		m_pDlgSSG->UpdateData();
 		m_pDlgSSG->ShowWindow(SW_HIDE);
+
+		m_pDlgABA->m_ISO = m_ISO = m_pDlgSSG->m_ISO;
+		m_pDlgABA->SetData();
 		m_pDlgABA->ShowWindow(SW_SHOW);
 	}
 }

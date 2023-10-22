@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "ISO.h"
 
 // CDlgABA 对话框
 
@@ -22,8 +22,15 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+
+	ISO m_ISO;
+	void SetData();
+
 	CListBox m_cList;
+	CListCtrl m_cListData;
 	CString m_sNote;
 	afx_msg void OnLbnSelchangeList1();
 	BOOL m_bLinear;
+	
+
 };

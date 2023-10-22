@@ -190,6 +190,7 @@
     <ClInclude Include="DlgNL2.h" />
     <ClInclude Include="DlgSSG.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ISO.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />

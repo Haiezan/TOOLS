@@ -5,6 +5,7 @@
 #pragma once
 #include "DlgSSG.h"
 #include "DlgABA.h"
+#include "ISO.h"
 
 // CABAISODlg 对话框
 class CABAISODlg : public CDialogEx
@@ -34,6 +35,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CTabCtrl m_cTab;
+
+	ISO m_ISO;
 
 	CDlgSSG* m_pDlgSSG;
 	CDlgABA* m_pDlgABA;

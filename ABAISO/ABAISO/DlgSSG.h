@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "ISO.h"
 
 // CDlgSSG 对话框
 
@@ -21,6 +21,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+	ISO m_ISO;
+
 	CString m_sName;
 	BOOL m_bU[6];
 	float m_fK[6], m_fC[6];

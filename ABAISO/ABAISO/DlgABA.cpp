@@ -68,7 +68,7 @@ void CDlgABA::SetData()
 	m_cList.AddString(L"Elasticity");
 
 	if (m_ISO.IsPlastic()) m_cList.AddString(L"Plasticity");
-	//if (m_ISO.IsDamping()) m_cList.AddString(L"Damping");
+	if (m_ISO.IsDamping()) m_cList.AddString(L"Damping");
 	m_cList.SetCurSel(0);
 }
 
@@ -89,6 +89,8 @@ void CDlgABA::OnLbnSelchangeList1()
 	GetDlgItem(IDC_RADIO_DEF1)->ShowWindow(FALSE);
 	GetDlgItem(IDC_RADIO_DEF2)->ShowWindow(FALSE);
 	GetDlgItem(IDC_RADIO_DEF3)->ShowWindow(FALSE);
+	GetDlgItem(IDC_CHECK_HARD1)->ShowWindow(FALSE);
+	GetDlgItem(IDC_CHECK_HARD2)->ShowWindow(FALSE);
 
 	//弹性参数
 	if (m_sNote == L"Elasticity")
@@ -134,6 +136,9 @@ void CDlgABA::OnLbnSelchangeList1()
 		GetDlgItem(IDC_RADIO_DEF2)->ShowWindow(TRUE);
 		GetDlgItem(IDC_RADIO_DEF3)->ShowWindow(TRUE);
 
+		GetDlgItem(IDC_CHECK_HARD1)->ShowWindow(TRUE);
+		GetDlgItem(IDC_CHECK_HARD2)->ShowWindow(TRUE);
+
 		float K0 = m_ISO.m_fNL[2]; //初始刚度
 		float Fb0 = m_ISO.m_fNL[3]; //屈服力
 		float B0 = m_ISO.m_fNL[4]; //屈服后刚度比
@@ -159,6 +164,28 @@ void CDlgABA::OnLbnSelchangeList1()
 		m_cListData.SetItemText(1, 1, str);
 		str.Format(L"%g", PlasticStrain);
 		m_cListData.SetItemText(1, 2, str);
+	}
+	else if (m_sNote == L"Damping")
+	{
+		m_iLinear = 0;
+		memcpy(m_bU, m_ISO.m_bU, 6 * sizeof(BOOL));
+
+		//建立表头，即为每列起名字。注意列是从1开始
+		m_cListData.InsertColumn(1, L"", LVCFMT_CENTER, 30);
+		m_cListData.InsertColumn(2, L"C11", LVCFMT_CENTER, 50);
+		m_cListData.InsertColumn(3, L"C22", LVCFMT_CENTER, 50);
+		m_cListData.InsertColumn(4, L"C33", LVCFMT_CENTER, 100);
+
+		//先创建行，再为改行每列赋值。注意列是从0开始
+		CString str;
+		m_cListData.InsertItem(0, L"1");
+		//m_cListData.SetItemText(0, 0, L"1");
+		str.Format(L"%g", m_ISO.m_fC[1]);
+		m_cListData.SetItemText(0, 1, str);
+		str.Format(L"%g", m_ISO.m_fC[2]);
+		m_cListData.SetItemText(0, 2, str);
+		str.Format(L"%g", m_ISO.m_fC[0]);
+		m_cListData.SetItemText(0, 3, str);
 	}
 	
 	UpdateData(FALSE);

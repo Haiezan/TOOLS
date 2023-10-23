@@ -28,7 +28,7 @@ void CDlgABA::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, m_cList);
 	DDX_Text(pDX, IDC_STATIC_NOTE, m_sNote);
-	DDX_Radio(pDX, IDC_RADIO_LINEAR, m_bLinear);
+	DDX_Radio(pDX, IDC_RADIO_LINEAR, m_iLinear);
 	DDX_Control(pDX, IDC_LIST2, m_cListData);
 	DDX_Check(pDX, IDC_CHECK_F1, m_bU[0]);
 	DDX_Check(pDX, IDC_CHECK_F2, m_bU[1]);
@@ -83,7 +83,7 @@ void CDlgABA::OnLbnSelchangeList1()
 	//弹性参数
 	if (m_sNote == L"Elasticity")
 	{
-		m_bLinear = TRUE;
+		m_iLinear = 0;
 		memcpy(m_bU, m_ISO.m_bU, 6 * sizeof(BOOL));
 
 		//建立表头，即为每列起名字。注意列是从1开始
@@ -105,7 +105,7 @@ void CDlgABA::OnLbnSelchangeList1()
 	}
 	else if (m_sNote == L"Plasticity")
 	{
-		m_bLinear = FALSE;
+		m_iLinear = 1;
 		memset(m_bU, 0, 6 * sizeof(BOOL));
 		m_bU[0] = m_ISO.m_bUN[1];
 		m_bU[1] = m_ISO.m_bUN[2];
@@ -117,7 +117,7 @@ void CDlgABA::OnLbnSelchangeList1()
 		float Fb0 = m_ISO.m_fNL[3]; //屈服力
 		float B0 = m_ISO.m_fNL[4]; //屈服后刚度比
 
-		float Fb1 = (1.0 - Fb0 / K0) * K0 * B0 + Fb0; //应变为1时对应内力
+		float Fb1 = (1.f - Fb0 / K0) * K0 * B0 + Fb0; //应变为1时对应内力
 		float PlasticStrain = 1.f - Fb1 / K0; //应变为1时对应塑性应变
 
 		//建立表头，即为每列起名字。注意列是从1开始

@@ -30,7 +30,7 @@ public:
 	CListCtrl m_cListData;
 	CString m_sNote;
 	afx_msg void OnLbnSelchangeList1();
-	BOOL m_bLinear;
+	BOOL m_iLinear;
 	
 
 	BOOL m_bU[6];

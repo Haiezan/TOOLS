@@ -15,6 +15,7 @@ CDlgABA::CDlgABA(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG_ABA, pParent)
 	, m_bHard1(FALSE)
 	, m_bHard2(FALSE)
+	, m_iDef(0)
 {
 
 }
@@ -35,6 +36,8 @@ void CDlgABA::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_F3, m_bU[2]);
 	DDX_Check(pDX, IDC_CHECK_HARD1, m_bHard1);
 	DDX_Check(pDX, IDC_CHECK_HARD2, m_bHard2);
+	DDX_Control(pDX, IDC_TAB2, m_cTabHard);
+	DDX_Radio(pDX, IDC_RADIO_DEF1, m_iDef);
 }
 
 
@@ -80,6 +83,13 @@ void CDlgABA::OnLbnSelchangeList1()
 	//初始化列表样式。参数为：整行选择、网格线
 	m_cListData.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
+	m_cTabHard.ShowWindow(FALSE);
+	m_cTabHard.DeleteAllItems();
+	GetDlgItem(IDC_STATIC_DEF)->ShowWindow(FALSE);
+	GetDlgItem(IDC_RADIO_DEF1)->ShowWindow(FALSE);
+	GetDlgItem(IDC_RADIO_DEF2)->ShowWindow(FALSE);
+	GetDlgItem(IDC_RADIO_DEF3)->ShowWindow(FALSE);
+
 	//弹性参数
 	if (m_sNote == L"Elasticity")
 	{
@@ -113,6 +123,17 @@ void CDlgABA::OnLbnSelchangeList1()
 		m_bHard1 = FALSE;
 		m_bHard2 = TRUE;
 
+		m_cTabHard.ShowWindow(TRUE);
+		m_cTabHard.InsertItem(0, L"Istropic Hardening");
+		m_cTabHard.InsertItem(1, L"Kinematic Hardening");
+		m_cTabHard.InsertItem(2, L"Force Potential");
+		m_cTabHard.SetCurSel(1);
+
+		GetDlgItem(IDC_STATIC_DEF)->ShowWindow(TRUE);
+		GetDlgItem(IDC_RADIO_DEF1)->ShowWindow(TRUE);
+		GetDlgItem(IDC_RADIO_DEF2)->ShowWindow(TRUE);
+		GetDlgItem(IDC_RADIO_DEF3)->ShowWindow(TRUE);
+
 		float K0 = m_ISO.m_fNL[2]; //初始刚度
 		float Fb0 = m_ISO.m_fNL[3]; //屈服力
 		float B0 = m_ISO.m_fNL[4]; //屈服后刚度比
@@ -139,5 +160,7 @@ void CDlgABA::OnLbnSelchangeList1()
 		str.Format(L"%g", PlasticStrain);
 		m_cListData.SetItemText(1, 2, str);
 	}
+	
 	UpdateData(FALSE);
+
 }

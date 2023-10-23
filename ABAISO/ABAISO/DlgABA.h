@@ -38,4 +38,6 @@ public:
 	BOOL m_bHard1;
 	// 随动强化
 	BOOL m_bHard2;
+	CTabCtrl m_cTabHard;
+	int m_iDef;
 };

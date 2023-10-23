@@ -218,7 +218,7 @@ void CABAISODlg::ViewDlg()
 		m_pDlgSSG->ShowWindow(SW_HIDE);
 
 		m_pDlgABA->m_ISO = m_ISO = m_pDlgSSG->m_ISO;
-		m_pDlgABA->SetData();
+		m_pDlgABA->OnInitDialog();
 		m_pDlgABA->ShowWindow(SW_SHOW);
 	}
 }

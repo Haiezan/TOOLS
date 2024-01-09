@@ -81,6 +81,39 @@ bool ReadSSGFile(CFileInfo* pfile)
 			}
 			continue;
 		}
+		//读取节点信息
+		//读取地下室层数
+		if (strstr(str, "*COOR NUMBER=") != NULL)
+		{
+			if (ReadALine.GetNumFromStr(str, "*COOR NUMBER=", 0, 1, ff) != FALSE)
+			{
+				int num = int(ff[0]);
+				float Xmax = 0.f, Xmin = 0.f, Ymax = 0.f, Ymin = 0.f;
+				for (int i = 0; i<num; i++)
+				{
+					strcpy(str, ReadALine.ReadAString(fd));
+					if (ReadALine.GetNumFromStr(str, "", 0, 20, ff) != FALSE)
+					{
+						if (i == 0)
+						{
+							Xmax = Xmin = ff[1];
+							Ymax = Ymin = ff[2];
+						}
+						else
+						{
+							Xmax = max(Xmax, ff[1]);
+							Xmin = min(Xmin, ff[1]);
+							Ymax = max(Ymax, ff[2]);
+							Ymin = min(Ymin, ff[2]);
+						}
+					}
+				}
+
+				pfile->BuInfo[7] = Xmax - Xmin;
+				pfile->BuInfo[8] = Ymax - Ymin;
+			}
+			continue;
+		}
 	}
 
 	fclose(fd);

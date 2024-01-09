@@ -1,5 +1,6 @@
 #pragma once
 
+const int DATANUM = 10;
 
 class CFileInfo
 {
@@ -24,7 +25,7 @@ public:
 
 	HTREEITEM hItem;
 
-	float BuInfo[10] = { 0.f };
+	float BuInfo[DATANUM] = { 0.f };
 
 	bool OpenFile(CString exe);
 };

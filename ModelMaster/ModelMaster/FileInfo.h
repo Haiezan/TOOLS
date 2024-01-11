@@ -27,6 +27,9 @@ public:
 
 	float BuInfo[DATANUM] = { 0.f };
 
+	BOOL bHasISO;
+	BOOL bHasDamper;
+
 	bool OpenFile(CString exe);
 };
 

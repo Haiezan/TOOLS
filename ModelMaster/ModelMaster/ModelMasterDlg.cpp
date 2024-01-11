@@ -522,7 +522,7 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 		bFlag = TRUE;
 
 	FILE* fd = fopen("info.csv","w");
-	fprintf(fd, "项目名称,文件名称,设防类别,场地类别,场地分组,地震烈度,层数,地下室层数,高度,X,Y\n");
+	fprintf(fd, "项目名称,文件名称,设防类别,场地类别,场地分组,地震烈度,层数,地下室层数,高度,X,Y,减震,隔震\n");
 
 	
 	for (int i = 0; i < m_ProjectList.size(); i++)
@@ -538,7 +538,9 @@ void CModelMasterDlg::OnBnClickedButtonWrite()
 				//相同模型不再重复输出
 				if (j != 0 && bFlag&&abs(pfile->BuInfo[6] - pfileold->BuInfo[6]) < 0.1f) continue;
 
-				fprintf(fd, "%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", m_ProjectList[i].sName, pfile->FileTitle, pfile->BuInfo[0], pfile->BuInfo[1], pfile->BuInfo[2], pfile->BuInfo[3], pfile->BuInfo[4], pfile->BuInfo[5], pfile->BuInfo[6], pfile->BuInfo[7], pfile->BuInfo[8]);
+				fprintf(fd, "%s,%s,%f,%f,%f,%f,%f,%f,%0.2f,%0.2f,%0.2f,", m_ProjectList[i].sName, pfile->FileTitle, pfile->BuInfo[0], pfile->BuInfo[1], pfile->BuInfo[2], pfile->BuInfo[3], pfile->BuInfo[4], pfile->BuInfo[5], pfile->BuInfo[6], pfile->BuInfo[7], pfile->BuInfo[8]);
+				fprintf(fd, "%s,%s", pfile->bHasDamper ? "YES" : "NO", pfile->bHasISO ? "YES" : "NO");
+				fprintf(fd, "\n");
 				pfileold = pfile;
 			}
 		}

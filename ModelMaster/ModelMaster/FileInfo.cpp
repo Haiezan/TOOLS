@@ -4,6 +4,8 @@
 
 CFileInfo::CFileInfo()
 {
+	bHasISO = FALSE;
+	bHasDamper = FALSE;
 }
 
 

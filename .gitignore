@@ -51,3 +51,4 @@ ModelMaster/Release
 Debug/
 Release/
 *.APS
+/by/build

@@ -47,16 +47,16 @@ def decrypt_file(input_file, output_file, key):
 # 获取用户输入的密钥，确保长度合法
 def get_user_key():
     while True:
-        key = input("?? 请输入加密/解密密钥（16/24/32 字节）：").encode('utf-8')
+        key = input("input keys (16/24/32):").encode('utf-8')
         if len(key) in (16, 24, 32):
             return key
-        print("? 密钥长度必须为 16、24 或 32 字节，请重新输入！")
+        print("must be 16/24/32!")
 
 # 获取用户输入
 def get_user_input():
     # 选择操作类型
     while True:
-        mode = input("🔐 请选择操作 (1-加密, 2-解密)：").strip()
+        mode = input("Please select (1-en, 2-de): ").strip()
         if mode == '1':
             mode = 'encrypt'
             break
@@ -64,24 +64,20 @@ def get_user_input():
             mode = 'decrypt'
             break
         else:
-            print("❌ 输入错误，请输入 1（加密）或 2（解密）")
+            print("Error!")
 
     # 选择输入文件路径
     input_files = []
     while True:
-        file_path = input("📄 请输入文件路径（输入 'done' 结束）：").strip()
-        if file_path.lower() == 'done':
-            if input_files:
-                break
-            else:
-                print("❌ 你尚未提供任何文件路径！")
-        elif os.path.isfile(file_path):
+        file_path = input("Input file: ").strip()
+        if os.path.isfile(file_path):
             input_files.append(file_path)
+            break
         else:
-            print("❌ 文件不存在，请重新输入。")
+            print("Error!")
 
     # 选择输出目录
-    output_folder = input("📂 请输入输出文件夹路径：").strip()
+    output_folder = input("Output file：").strip()
 
     # 获取密钥
     key = get_user_key()
@@ -90,7 +86,7 @@ def get_user_input():
 
 # 主程序
 def main():
-    print("🚀 欢迎使用文件加密/解密工具")
+    print("Welcome!")
     mode, input_files, output_folder, key = get_user_input()
 
     # 执行加密或解密
@@ -101,7 +97,7 @@ def main():
         for file in input_files:
             decrypt_file(file, output_folder, key)
 
-    print("🎉 操作已完成，感谢使用！")
+    print("Completed, 3Q!")
 
 if __name__ == "__main__":
     main()

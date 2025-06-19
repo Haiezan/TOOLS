@@ -20,7 +20,6 @@ protected:
     virtual void DoDataExchange(CDataExchange* pDX);
     virtual BOOL OnInitDialog();
     afx_msg void OnSize(UINT nType, int cx, int cy);
-    afx_msg void OnTimer(UINT_PTR nIDEvent);
 
     DECLARE_MESSAGE_MAP()
 

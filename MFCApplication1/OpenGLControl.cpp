@@ -221,13 +221,13 @@ void COpenGLControl::OnMouseMove(UINT nFlags, CPoint point) {
     CWnd::OnMouseMove(nFlags, point);
 }
 
-void COpenGLControl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
+BOOL COpenGLControl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
     // 鼠标滚轮缩放
     m_zoom += zDelta * 0.001f;
     m_zoom = max(0.1f, min(5.0f, m_zoom));
     Invalidate(FALSE);
 
-    CWnd::OnMouseWheel(nFlags, zDelta, pt);
+    return TRUE; // 表示已处理该消息
 }
 
 BEGIN_MESSAGE_MAP(COpenGLControl, CWnd)

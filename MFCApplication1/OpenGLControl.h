@@ -28,7 +28,7 @@ protected:
     afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-    afx_msg void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+    afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 private:
     HGLRC m_hRC;
@@ -47,5 +47,4 @@ private:
     bool SetupPixelFormat();
     void GLSetup();
     void DrawSurface();
-    void UpdateView();
 };

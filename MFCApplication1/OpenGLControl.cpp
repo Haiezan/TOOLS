@@ -3,7 +3,6 @@
 #include <cmath>
 
 const double PI = 3.14159265358979323846;
-const float AXIS_LENGTH = 2.0f;  // 坐标轴长度
 
 COpenGLControl::COpenGLControl()
     : m_hRC(NULL), m_pDC(NULL),
@@ -70,13 +69,8 @@ bool COpenGLControl::SetupPixelFormat() {
 void COpenGLControl::GLSetup() {
     // 白色背景
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-    // 启用深度测试以实现遮挡效果
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-
-    // 禁用光照
-    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);  // 线框模式不需要光照
 }
 
 void COpenGLControl::OnPaint() {
@@ -101,7 +95,7 @@ void COpenGLControl::Render() {
     glRotatef(m_rotY, 0.0f, 1.0f, 0.0f);
     glRotatef(m_rotZ, 0.0f, 0.0f, 1.0f);
 
-    // 绘制坐标轴（先绘制，这样球体线框可以遮挡它）
+    // 绘制坐标轴
     DrawCoordinateAxes();
 
     // 绘制球体
@@ -162,12 +156,8 @@ void COpenGLControl::DrawSphere() {
 
     // 设置线框模式
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // 设置线宽
     glLineWidth(1.0f);
-
-    // 黑色线框
-    glColor3f(0.0f, 0.0f, 0.0f);
+    glColor3f(0.0f, 0.0f, 0.0f);  // 黑色线框
 
     for (int i = 0; i < stacks; ++i) {
         glBegin(GL_TRIANGLE_STRIP);
@@ -181,35 +171,120 @@ void COpenGLControl::DrawSphere() {
         glEnd();
     }
 
-    // 恢复填充模式
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+void COpenGLControl::DrawArrow(float length) {
+    // 简单箭头替代方案（不使用GLUT）
+    glBegin(GL_TRIANGLES);
+    glVertex3f(0.0f, 0.0f, length);
+    glVertex3f(-0.05f, 0.0f, length - 0.2f);
+    glVertex3f(0.05f, 0.0f, length - 0.2f);
+
+    glVertex3f(0.0f, 0.0f, length);
+    glVertex3f(0.0f, -0.05f, length - 0.2f);
+    glVertex3f(0.0f, 0.05f, length - 0.2f);
+    glEnd();
+}
+
 void COpenGLControl::DrawCoordinateAxes() {
-    // 设置线宽（坐标轴比球体线框粗一些）
-    glLineWidth(2.0f);
+    const float axisLength = 1.5f;  // 坐标轴长度
+    const float tickSize = 0.05f;   // 刻度线大小
+    const int numTicks = 10;        // 每条轴上的刻度数量
 
-    glBegin(GL_LINES);
+    // 启用线宽
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // X轴 (红色)
+    // 绘制X轴（红色）
     glColor3f(1.0f, 0.0f, 0.0f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(AXIS_LENGTH, 0.0f, 0.0f);
-
-    // Y轴 (绿色)
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, AXIS_LENGTH, 0.0f);
-
-    // Z轴 (蓝色)
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, AXIS_LENGTH);
-
+    glVertex3f(axisLength, 0.0f, 0.0f);
     glEnd();
 
-    // 恢复默认线宽
+    // X轴箭头
+    glPushMatrix();
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);  // 旋转使箭头朝向X轴正方向
+    DrawArrow(axisLength);
+    glPopMatrix();
+
+    // X轴刻度
+    glColor3f(0.5f, 0.0f, 0.0f);  // 暗红色刻度
     glLineWidth(1.0f);
+    glBegin(GL_LINES);
+    for (int i = 1; i <= numTicks; ++i) {
+        float pos = axisLength * i / numTicks;
+        glVertex3f(pos, -tickSize, 0.0f);
+        glVertex3f(pos, tickSize, 0.0f);
+        glVertex3f(pos, 0.0f, -tickSize);
+        glVertex3f(pos, 0.0f, tickSize);
+    }
+    glEnd();
+
+    // 绘制Y轴（绿色）
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, axisLength, 0.0f);
+    glEnd();
+
+    // Y轴箭头
+    glPushMatrix();
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);  // 旋转使箭头朝向Y轴正方向
+    DrawArrow(axisLength);
+    glPopMatrix();
+
+    // Y轴刻度
+    glColor3f(0.0f, 0.5f, 0.0f);  // 暗绿色刻度
+    glLineWidth(1.0f);
+    glBegin(GL_LINES);
+    for (int i = 1; i <= numTicks; ++i) {
+        float pos = axisLength * i / numTicks;
+        glVertex3f(-tickSize, pos, 0.0f);
+        glVertex3f(tickSize, pos, 0.0f);
+        glVertex3f(0.0f, pos, -tickSize);
+        glVertex3f(0.0f, pos, tickSize);
+    }
+    glEnd();
+
+    // 绘制Z轴（蓝色）
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, axisLength);
+    glEnd();
+
+    // Z轴箭头（默认朝向Z轴正方向）
+    DrawArrow(axisLength);
+
+    // Z轴刻度
+    glColor3f(0.0f, 0.0f, 0.5f);  // 暗蓝色刻度
+    glLineWidth(1.0f);
+    glBegin(GL_LINES);
+    for (int i = 1; i <= numTicks; ++i) {
+        float pos = axisLength * i / numTicks;
+        glVertex3f(-tickSize, 0.0f, pos);
+        glVertex3f(tickSize, 0.0f, pos);
+        glVertex3f(0.0f, -tickSize, pos);
+        glVertex3f(0.0f, tickSize, pos);
+    }
+    glEnd();
+
+    // 绘制原点（黑色小方块）
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glPointSize(6.0f);
+    glBegin(GL_POINTS);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glEnd();
+
+    glDisable(GL_LINE_SMOOTH);
+    glDisable(GL_BLEND);
 }
 
 // 鼠标交互实现

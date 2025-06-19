@@ -46,5 +46,6 @@ private:
     bool SetupPixelFormat();
     void GLSetup();
     void DrawSphere();
-    void DrawCoordinateAxes();  // 新增坐标轴绘制方法
+    void DrawCoordinateAxes();  // 新增：绘制坐标轴
+    void DrawArrow(float length);  // 新增：绘制箭头
 };

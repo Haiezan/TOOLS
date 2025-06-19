@@ -19,25 +19,33 @@ public:
     void Resize(int width, int height);
 
     void GenerateSurfaceData(int width, int height);
-    void SetRotation(float x, float y, float z);
-    void SetZoom(float zoom);
 
 protected:
     DECLARE_MESSAGE_MAP()
     afx_msg void OnPaint();
     afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+    afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+    afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+    afx_msg void OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
 private:
     HGLRC m_hRC;
     CDC* m_pDC;
 
     std::vector<std::vector<Point3D>> m_surfacePoints;
+    GLuint m_surfaceDL;
+
+    // 鼠标交互相关变量
+    bool m_bDragging;
+    CPoint m_ptLastPos;
     float m_rotX, m_rotY, m_rotZ;
     float m_zoom;
-    GLuint m_surfaceDL;
+    float m_transX, m_transY;
 
     bool SetupPixelFormat();
     void GLSetup();
     void DrawSurface();
+    void UpdateView();
 };

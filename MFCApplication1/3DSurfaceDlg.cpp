@@ -29,7 +29,6 @@ void C3DSurfaceDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(C3DSurfaceDlg, CDialogEx)
     ON_WM_SIZE()
-    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 BOOL C3DSurfaceDlg::OnInitDialog() {
@@ -55,14 +54,4 @@ void C3DSurfaceDlg::OnSize(UINT nType, int cx, int cy) {
         rect.DeflateRect(10, 10);
         m_glControl.MoveWindow(rect);
     }
-}
-
-void C3DSurfaceDlg::OnTimer(UINT_PTR nIDEvent) {
-    if (nIDEvent == 1) {
-        static float angle = 0;
-        angle += 1.0f;
-        if (angle > 360) angle -= 360;
-        m_glControl.SetRotation(angle, angle * 0.7f, angle * 0.3f);
-    }
-    CDialogEx::OnTimer(nIDEvent);
 }

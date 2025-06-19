@@ -3,8 +3,10 @@
 
 COpenGLControl::COpenGLControl()
     : m_hRC(NULL), m_pDC(NULL),
+    m_bDragging(false),
     m_rotX(30.0f), m_rotY(0.0f), m_rotZ(0.0f),
-    m_zoom(1.0f), m_surfaceDL(0) {}
+    m_zoom(1.0f), m_transX(0.0f), m_transY(0.0f),
+    m_surfaceDL(0) {}
 
 COpenGLControl::~COpenGLControl() {
     if (m_hRC) {
@@ -95,8 +97,12 @@ void COpenGLControl::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    // 设置视点
     gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
 
+    // 应用变换
+    glTranslatef(m_transX, m_transY, 0.0f);
     glScalef(m_zoom, m_zoom, m_zoom);
     glRotatef(m_rotX, 1.0f, 0.0f, 0.0f);
     glRotatef(m_rotY, 0.0f, 1.0f, 0.0f);
@@ -180,18 +186,56 @@ void COpenGLControl::DrawSurface() {
     }
 }
 
-void COpenGLControl::SetRotation(float x, float y, float z) {
-    m_rotX = x; m_rotY = y; m_rotZ = z;
-    Invalidate(FALSE);
+// 鼠标交互实现
+void COpenGLControl::OnLButtonDown(UINT nFlags, CPoint point) {
+    m_bDragging = true;
+    m_ptLastPos = point;
+    SetCapture();
+    CWnd::OnLButtonDown(nFlags, point);
 }
 
-void COpenGLControl::SetZoom(float zoom) {
-    m_zoom = zoom;
+void COpenGLControl::OnLButtonUp(UINT nFlags, CPoint point) {
+    m_bDragging = false;
+    ReleaseCapture();
+    CWnd::OnLButtonUp(nFlags, point);
+}
+
+void COpenGLControl::OnMouseMove(UINT nFlags, CPoint point) {
+    if (m_bDragging) {
+        CSize offset = point - m_ptLastPos;
+
+        if (nFlags & MK_CONTROL) {
+            // CTRL+拖动：平移
+            m_transX += offset.cx * 0.01f;
+            m_transY -= offset.cy * 0.01f;
+        }
+        else {
+            // 普通拖动：旋转
+            m_rotY += offset.cx * 0.5f;
+            m_rotX += offset.cy * 0.5f;
+        }
+
+        m_ptLastPos = point;
+        Invalidate(FALSE);
+    }
+    CWnd::OnMouseMove(nFlags, point);
+}
+
+void COpenGLControl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
+    // 鼠标滚轮缩放
+    m_zoom += zDelta * 0.001f;
+    m_zoom = max(0.1f, min(5.0f, m_zoom));
     Invalidate(FALSE);
+
+    CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 BEGIN_MESSAGE_MAP(COpenGLControl, CWnd)
     ON_WM_PAINT()
     ON_WM_SIZE()
     ON_WM_ERASEBKGND()
+    ON_WM_LBUTTONDOWN()
+    ON_WM_LBUTTONUP()
+    ON_WM_MOUSEMOVE()
+    ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()

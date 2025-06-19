@@ -18,7 +18,7 @@ public:
     void Render();
     void Resize(int width, int height);
 
-    void GenerateSurfaceData(int width, int height);
+    void GenerateSphereData(int slices, int stacks);
 
 protected:
     DECLARE_MESSAGE_MAP()
@@ -34,10 +34,9 @@ private:
     HGLRC m_hRC;
     CDC* m_pDC;
 
-    std::vector<std::vector<Point3D>> m_surfacePoints;
-    GLuint m_surfaceDL;
+    std::vector<std::vector<Point3D>> m_spherePoints;
+    GLuint m_sphereDL;
 
-    // 鼠标交互相关变量
     bool m_bDragging;
     CPoint m_ptLastPos;
     float m_rotX, m_rotY, m_rotZ;
@@ -46,5 +45,6 @@ private:
 
     bool SetupPixelFormat();
     void GLSetup();
-    void DrawSurface();
+    void DrawSphere();
+    void DrawCoordinateAxes();  // 新增坐标轴绘制方法
 };

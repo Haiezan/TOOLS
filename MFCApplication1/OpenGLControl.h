@@ -2,6 +2,7 @@
 #include <vector>
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#include <gdiplus.h>
 
 struct Point3D {
     double x, y, z;
@@ -19,7 +20,7 @@ public:
     void Resize(int width, int height);
 
     void GenerateSphereData(int slices, int stacks);
-
+    std::vector<std::vector<Point3D>> m_spherePoints;
 protected:
     DECLARE_MESSAGE_MAP()
     afx_msg void OnPaint();
@@ -29,12 +30,14 @@ protected:
     afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
     afx_msg void OnMouseMove(UINT nFlags, CPoint point);
     afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+    afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 
 private:
     HGLRC m_hRC;
     CDC* m_pDC;
+    ULONG_PTR m_gdiplusToken;  // GDI+初始化令牌
 
-    std::vector<std::vector<Point3D>> m_spherePoints;
+    
     GLuint m_sphereDL;
 
     bool m_bDragging;
@@ -46,6 +49,7 @@ private:
     bool SetupPixelFormat();
     void GLSetup();
     void DrawSphere();
-    void DrawCoordinateAxes();  // 新增：绘制坐标轴
-    void DrawArrow(float length);  // 新增：绘制箭头
+    void DrawAnnotations(CDC* pDC);
+    void DrawArrow(Graphics& graphics, PointF start, PointF end, Color color, REAL size);
+
 };

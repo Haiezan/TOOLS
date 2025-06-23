@@ -9,5 +9,15 @@
 
 // 添加要在此处预编译的标头
 #include "framework.h"
+// stdafx.h
+#pragma once
 
+#include <windows.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#include <gdiplus.h>  // 添加GDI+支持
+
+// 添加GDI+命名空间
+using namespace Gdiplus;
+#pragma comment(lib, "gdiplus.lib")
 #endif //PCH_H

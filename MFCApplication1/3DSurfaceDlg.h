@@ -23,6 +23,6 @@ protected:
 
     DECLARE_MESSAGE_MAP()
 
-private:
+public:
     COpenGLControl m_glControl;
 };

@@ -3,7 +3,9 @@
 //
 
 #pragma once
-
+#include <string>
+#include <vector>
+#include "OpenGLControl.h"
 
 // CMFCApplication1Dlg 对话框
 class CMFCApplication1Dlg : public CDialogEx
@@ -31,6 +33,9 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+
 public:
 	afx_msg void OnBnClickedButton1();
+	std::vector < std::vector<Point3D>> m_pointCloud;
+	bool LoadPointDataFromFile(const std::wstring& filename);
 };

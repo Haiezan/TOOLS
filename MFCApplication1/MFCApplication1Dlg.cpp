@@ -101,7 +101,9 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	LoadPointDataFromFile(L"D:\\Github\\TOOLS\\MFCApplication1\\B8527\\PMM_RD.dat");
 	C3DSurfaceDlg dlg;
+	dlg.m_glControl.m_spherePoints = m_pointCloud;
 	dlg.DoModal();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -161,4 +163,81 @@ HCURSOR CMFCApplication1Dlg::OnQueryDragIcon()
 void CMFCApplication1Dlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+#include <fstream>
+#include <sstream>
+#include <locale>
+#include <codecvt>
+// 从文本文件加载点数据
+bool CMFCApplication1Dlg::LoadPointDataFromFile(const std::wstring& filename) {
+	// 清空现有数据
+	m_pointCloud.clear();
+	m_pointCloud.resize(36);
+	// 打开文件
+	std::wifstream file(filename);
+	if (!file.is_open()) {
+		AfxMessageBox(_T("无法打开文件"));
+		return false;
+	}
+
+	// 设置UTF-8本地化（支持中文路径）
+	//std::locale utf8_locale(std::locale(), new std::codecvt_utf8<wchar_t>);
+	//file.imbue(utf8_locale);
+
+	std::wstring line;
+	int lineNum = 0;
+	std::getline(file, line);
+
+	while (std::getline(file, line)) {
+		lineNum++;
+
+		// 跳过空行和注释行（以#开头）
+		if (line.empty() || line[0] == L'#') {
+			continue;
+		}
+
+		std::wistringstream iss(line);
+		Point3D point;
+		wchar_t sep;
+
+		// 尝试读取三种常见格式：
+		// 1. x y z
+		// 2. x,y,z
+		// 3. x; y; z
+
+		// 尝试空格分隔
+		for (int ii = 0; ii < 36; ii++)
+		{
+			if (iss >> point.x >> point.y >> point.z) {
+				m_pointCloud[ii].push_back(point);
+			}
+		}
+		continue;
+
+		// 清除错误状态
+		iss.clear();
+		iss.seekg(0);
+
+		// 尝试逗号分隔
+		if (iss >> point.x >> sep >> point.y >> sep >> point.z && (sep == L',' || sep == L';')) {
+			m_pointCloud[0].push_back(point);
+			continue;
+		}
+
+		// 如果都不成功，报告错误行
+		CString msg;
+		msg.Format(_T("第%d行数据格式错误: %s"), lineNum, line.c_str());
+		AfxMessageBox(msg);
+	}
+
+	file.close();
+
+	if (m_pointCloud.empty()) {
+		AfxMessageBox(_T("文件未包含有效数据"));
+		return false;
+	}
+
+
+	return true;
 }

@@ -40,8 +40,6 @@ BOOL C3DSurfaceDlg::OnInitDialog() {
     m_glControl.Create(rect, this);
     m_glControl.InitOpenGL();
 
-    SetTimer(1, 30, NULL);
-
     return TRUE;
 }
 

@@ -455,7 +455,7 @@ void COpenGLControl::DrawSphere() {
 
     float amp = 1. / 1000;
     for (int i = 0; i < stacks+1; ++i) {
-        glBegin(GL_TRIANGLE_STRIP);
+        glBegin(GL_QUAD_STRIP);
         for (int j = 0; j <= slices; ++j) {
             Point3D p1 = m_spherePoints[i% stacks][j];
             glVertex3f(p1.x * amp, p1.y * amp, p1.z * amp * 0.1);

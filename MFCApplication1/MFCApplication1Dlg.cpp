@@ -102,8 +102,14 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	LoadPointDataFromFile(L"D:\\Github\\TOOLS\\MFCApplication1\\B8527\\PMM_RD.dat");
+
+	nLongitudeLines = m_pointCloud.size();
+	nLatitudeLines = m_pointCloud[0].size();
+
+	InterpilateSurface(nLongitudeLines, nLatitudeLines);
+
 	C3DSurfaceDlg dlg;
-	dlg.m_glControl.m_spherePoints = m_pointCloud;
+	dlg.m_glControl.m_spherePoints = m_pointSurface;
 	dlg.DoModal();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -169,6 +175,7 @@ void CMFCApplication1Dlg::OnBnClickedButton1()
 #include <sstream>
 #include <locale>
 #include <codecvt>
+#include <iomanip>
 // 从文本文件加载点数据
 bool CMFCApplication1Dlg::LoadPointDataFromFile(const std::wstring& filename) {
 	// 清空现有数据
@@ -240,4 +247,133 @@ bool CMFCApplication1Dlg::LoadPointDataFromFile(const std::wstring& filename) {
 
 
 	return true;
+}
+
+bool CMFCApplication1Dlg::InterpilateSurface(int nLongitudeLines, int nLatitudeLines)
+{
+	//计算极值
+	float minX, maxX;
+	float minY, maxY;
+	float minZ, maxZ;
+	for (int i = 0; i < m_pointCloud.size(); i++)
+	{
+		for (int j = 0; j < m_pointCloud[i].size(); j++)
+		{
+			if (i == 0 && j == 0)
+			{
+				minX = maxX = m_pointCloud[i][j].x;
+				minY = maxY = m_pointCloud[i][j].y;
+				minZ = maxZ = m_pointCloud[i][j].z;
+			}
+			else
+			{
+				minX = min(minX, m_pointCloud[i][j].x);
+				maxX = max(maxX, m_pointCloud[i][j].x);
+
+				minY = min(minY, m_pointCloud[i][j].y);
+				maxY = max(maxY, m_pointCloud[i][j].y);
+
+				minZ = min(minZ, m_pointCloud[i][j].z);
+				maxZ = max(maxZ, m_pointCloud[i][j].z);
+			}
+		}
+	}
+
+	//计算坐标
+	m_pointSurface.clear();
+	m_pointSurface.resize(nLongitudeLines);
+
+	float dZ = (maxZ - minZ) / (nLatitudeLines - 1);
+	for (int i = 0; i < nLongitudeLines; ++i)
+	{
+		m_pointSurface[i].resize(nLatitudeLines);
+
+		std::vector<float> xx, yy, zz;
+		xx.clear();
+		yy.clear();
+		zz.clear();
+		for (int j = 0; j < nLatitudeLines; j++)
+		{
+			xx.push_back(m_pointCloud[i][j].x);
+			yy.push_back(m_pointCloud[i][j].y);
+			zz.push_back(m_pointCloud[i][j].z);
+		}
+
+		float Z = minZ;
+		for (int j = 0; j < nLatitudeLines; j++)
+		{
+			float X = LinearInterpolation(zz, xx, Z);
+			float Y = LinearInterpolation(zz, yy, Z);
+			m_pointSurface[i][j] = Point3D(X, Y, Z);
+			Z += dZ;
+		}
+	}
+
+	//写文件
+	std::ofstream outFile("Surface");
+	if (!outFile.is_open())
+	{
+		return FALSE;
+	}
+
+	// 设置输出精度
+	outFile.precision(6);
+	outFile << std::fixed;
+
+	// 写入表头
+	outFile << "Longitude Index | Latitude Index | X Coordinate | Y Coordinate | Z Coordinate\n";
+	outFile << "----------------------------------------------------------------------------\n";
+
+	// 写入插值结果
+	for (size_t i = 0; i < m_pointSurface.size(); ++i)
+	{
+		for (size_t j = 0; j < m_pointSurface[i].size(); ++j)
+		{
+			const Point3D& pt = m_pointSurface[i][j];
+			outFile << std::setw(16) << j << " | "
+				<< std::setw(15) << i << " | "
+				<< std::setw(13) << pt.x << " | "
+				<< std::setw(13) << pt.y << " | "
+				<< std::setw(13) << pt.z << "\n";
+		}
+	}
+
+	outFile.close();
+
+	return 1;
+}
+
+float CMFCApplication1Dlg::LinearInterpolation(const std::vector<float>& x,
+	const std::vector<float>& y, float xi) {
+	// 检查输入有效性
+	if (x.size() != y.size()) {
+		throw std::invalid_argument("x and y vectors must be of the same size");
+	}
+	if (x.empty()) {
+		throw std::invalid_argument("Input vectors cannot be empty");
+	}
+	if (xi < x.front()) {
+		return y.front();
+	}
+	if (xi > x.back()) {
+		return y.back();
+	}
+
+	// 查找xi所在的区间
+	size_t i = 0;
+	while (i < x.size() - 1 && x[i + 1] < xi) {
+		++i;
+	}
+
+	// 如果是正好等于某个点，直接返回对应的y值
+	if (xi == x[i]) {
+		return y[i];
+	}
+	if (i < x.size() - 1 && xi == x[i + 1]) {
+		return y[i + 1];
+	}
+
+	// 线性插值公式: y = y0 + (y1-y0)*(x-x0)/(x1-x0)
+	double slope = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+	return y[i] + slope * (xi - x[i]);
 }

@@ -38,4 +38,11 @@ public:
 	afx_msg void OnBnClickedButton1();
 	std::vector < std::vector<Point3D>> m_pointCloud;
 	bool LoadPointDataFromFile(const std::wstring& filename);
+
+	std::vector < std::vector<Point3D>> m_pointSurface;
+	int nLatitudeLines; //维度
+	int nLongitudeLines; //经度
+	bool InterpilateSurface(int nLongitudeLines, int nLatitudeLines);
+	float LinearInterpolation(const std::vector<float>& x,
+		const std::vector<float>& y, float xi);
 };

@@ -4,6 +4,8 @@
 #include "Sphere3DDlg.h"
 #include "afxdialogex.h"
 
+const double M_PI = 3.14159265358979323846;
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -20,15 +22,17 @@ CSphere3DDlg::CSphere3DDlg(CWnd* pParent)
     m_zTrans = -5.0f;
     m_zoom = 1.0f;
     m_bDragging = false;
-    m_sphere = nullptr;
     m_pDC = nullptr;
     m_hRC = nullptr;
 }
 
 CSphere3DDlg::~CSphere3DDlg()
 {
-    if (m_sphere)
-        gluDeleteQuadric(m_sphere);
+    if (m_hRC) {
+        wglMakeCurrent(NULL, NULL);
+        wglDeleteContext(m_hRC);
+    }
+    if (m_pDC) delete m_pDC;
 }
 
 void CSphere3DDlg::DoDataExchange(CDataExchange* pDX)
@@ -113,10 +117,6 @@ void CSphere3DDlg::InitializeOpenGL()
     // 初始化OpenGL状态 - 白色背景
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // 白色背景
     glEnable(GL_DEPTH_TEST);  // 启用深度测试保持遮挡效果
-
-    // 创建球体
-    m_sphere = gluNewQuadric();
-    gluQuadricDrawStyle(m_sphere, GLU_LINE); // 线框模式
 
     // 设置初始投影
     CRect rect;
@@ -223,12 +223,59 @@ void CSphere3DDlg::DrawSphere()
 {
     // 设置线框颜色为黑色
     glColor3f(0.0f, 0.0f, 0.0f);
-
-    // 设置线宽
     glLineWidth(1.0f);
 
-    // 绘制线框球体（已启用深度测试，自动处理遮挡）
-    gluSphere(m_sphere, 0.8, 32, 32);
+    const float radius = 0.8f; // 球体半径
+    const int slices = 32;     // 经度分段数
+    const int stacks = 32;     // 纬度分段数
+
+    // 生成并绘制球体顶点
+    for (int i = 0; i < stacks; ++i) {
+        // 当前纬度和下一纬度的角度
+        float phi1 = static_cast<float>(i) * M_PI / static_cast<float>(stacks);
+        float phi2 = static_cast<float>(i + 1) * M_PI / static_cast<float>(stacks);
+
+        // 绘制纬线（水平圆）
+        glBegin(GL_LINE_LOOP);
+        for (int j = 0; j <= slices; ++j) {
+            float theta = static_cast<float>(j) * 2.0f * M_PI / static_cast<float>(slices);
+
+            // 计算当前纬度的顶点坐标
+            float x = radius * sin(phi1) * cos(theta);
+            float y = radius * sin(phi1) * sin(theta);
+            float z = radius * cos(phi1);
+
+            glVertex3f(x, y, z);
+        }
+        glEnd();
+
+        // 绘制经线（从北极到南极的弧线）
+        for (int j = 0; j < slices; j += 2) {
+            glBegin(GL_LINE_STRIP);
+            for (int k = 0; k <= stacks; ++k) {
+                float phi = static_cast<float>(k) * M_PI / static_cast<float>(stacks);
+                float theta = static_cast<float>(j) * 2.0f * M_PI / static_cast<float>(slices);
+
+                // 计算顶点坐标
+                float x = radius * sin(phi) * cos(theta);
+                float y = radius * sin(phi) * sin(theta);
+                float z = radius * cos(phi);
+
+                glVertex3f(x, y, z);
+            }
+            glEnd();
+        }
+    }
+
+    // 绘制北极点
+    glBegin(GL_POINTS);
+    glVertex3f(0.0f, 0.0f, radius);
+    glEnd();
+
+    // 绘制南极点
+    glBegin(GL_POINTS);
+    glVertex3f(0.0f, 0.0f, -radius);
+    glEnd();
 }
 
 void CSphere3DDlg::OnPaint()

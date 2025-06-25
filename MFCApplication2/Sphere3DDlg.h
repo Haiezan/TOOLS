@@ -35,9 +35,6 @@ private:
     CPoint m_prevPoint;
     bool m_bDragging;
 
-    // 球体参数
-    GLUquadricObj* m_sphere;
-
     void InitializeOpenGL();
     void SetupProjection(int width, int height);
     void DrawScene();

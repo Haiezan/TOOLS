@@ -7,8 +7,8 @@
 
 struct Point3D 
 {
-    double x, y, z;
-    Point3D(double _x = 0, double _y = 0, double _z = 0) : x(_x), y(_y), z(_z) {}
+    float x, y, z;
+    Point3D(float _x = 0, float _y = 0, float _z = 0) : x(_x), y(_y), z(_z) {}
 };
 
 class CSphere3DDlg : public CDialogEx
@@ -54,6 +54,9 @@ private:
         CPoint startPoint, CPoint endPoint, int tickCount,
         bool isXAxis, bool isYAxis, bool isZAxis);
     void DrawAxes();
+    void DrawArrow(float x1, float y1, float z1,
+        float x2, float y2, float z2,
+        float r, float g, float b);
     void DrawSphere();
 
 public:
@@ -71,4 +74,5 @@ public:
     //曲面坐标
     void GenerateSphereData(int slices, int stacks);
     std::vector<std::vector<Point3D>> m_spherePoints;
+    float maxX, minX, maxY, minY, maxZ, minZ;
 };

@@ -66,6 +66,31 @@ BOOL CSphere3DDlg::OnInitDialog()
     m_rotationScroll.SetScrollRange(0, 360);
     m_rotationScroll.SetScrollPos(static_cast<int>(m_yRot));
 
+    //计算数据最值
+    for (int i = 0; i < m_spherePoints.size(); i++)
+    {
+        for (int j = 0; j < m_spherePoints[i].size(); j++)
+        {
+            if (i == 0 && j == 0)
+            {
+                minX = maxX = m_spherePoints[i][j].x;
+                minY = maxY = m_spherePoints[i][j].y;
+                minZ = maxZ = m_spherePoints[i][j].z;
+            }
+            else
+            {
+                minX = min(minX, m_spherePoints[i][j].x);
+                maxX = max(maxX, m_spherePoints[i][j].x);
+
+                minY = min(minY, m_spherePoints[i][j].y);
+                maxY = max(maxY, m_spherePoints[i][j].y);
+
+                minZ = min(minZ, m_spherePoints[i][j].z);
+                maxZ = max(maxZ, m_spherePoints[i][j].z);
+            }
+        }
+    }
+
     // 初始化OpenGL
     InitializeOpenGL();
 
@@ -141,7 +166,10 @@ void CSphere3DDlg::SetupProjection(int width, int height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0f, (GLdouble)width / (GLdouble)height, 0.1f, 100.0f);
+
+    // 根据窗口宽高比调整透视投影
+    float aspect = (float)width / (float)height;
+    gluPerspective(45.0f, aspect, 0.1f, 100.0f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -165,7 +193,7 @@ void CSphere3DDlg::DrawScene()
 
     // 绘制坐标轴和球体
     DrawAxes();
-    //GenerateSphereData(10, 36);
+    GenerateSphereData(10, 36);
     DrawSphere();
 
     SwapBuffers(m_pDC->GetSafeHdc());
@@ -213,28 +241,34 @@ void CSphere3DDlg::DrawAxisLabels()
 
     // 获取坐标轴端点的屏幕坐标
     CPoint origin = ProjectPoint(0, 0, 0);
-    CPoint xEnd = ProjectPoint(2.0f, 0, 0);
-    CPoint yEnd = ProjectPoint(0, 2.0f, 0);
-    CPoint zEnd = ProjectPoint(0, 0, 2.0f);
+    CPoint xEnd = ProjectPoint(2.5f, 0, 0);
+    CPoint xNegEnd = ProjectPoint(-2.5f, 0, 0);
+    CPoint yEnd = ProjectPoint(0, 2.5f, 0);
+    CPoint yNegEnd = ProjectPoint(0, -2.5f, 0);
+    CPoint zEnd = ProjectPoint(0, 0, 2.5f);
+    CPoint zNegEnd = ProjectPoint(0, 0, -2.5f);
 
     // 计算坐标轴长度（像素）
-    int axisLengthX = static_cast<int>(sqrt(pow(xEnd.x - origin.x, 2) + pow(xEnd.y - origin.y, 2)));
-    int axisLengthY = static_cast<int>(sqrt(pow(yEnd.x - origin.x, 2) + pow(yEnd.y - origin.y, 2)));
-    int axisLengthZ = static_cast<int>(sqrt(pow(zEnd.x - origin.x, 2) + pow(zEnd.y - origin.y, 2)));
+    int axisLengthX = static_cast<int>(sqrt(pow(xEnd.x - xNegEnd.x, 2) + pow(xEnd.y - xNegEnd.y, 2)));
+    int axisLengthY = static_cast<int>(sqrt(pow(yEnd.x - yNegEnd.x, 2) + pow(yEnd.y - yNegEnd.y, 2)));
+    int axisLengthZ = static_cast<int>(sqrt(pow(zEnd.x - zNegEnd.x, 2) + pow(zEnd.y - zNegEnd.y, 2)));
 
     // 确定刻度间隔（基于坐标轴长度）
     int maxAxisLength = max(axisLengthX, max(axisLengthY, axisLengthZ));
-    int tickCount = max(4, maxAxisLength / 50); // 每50像素一个刻度
+    int tickCount = max(5, maxAxisLength / 50); // 每50像素一个刻度
 
     // 绘制坐标轴标签
-    DrawAxisLabel(graphics, font, textBrush, xEnd, L"X", axisLengthX);
-    DrawAxisLabel(graphics, font, textBrush, yEnd, L"Y", axisLengthY);
-    DrawAxisLabel(graphics, font, textBrush, zEnd, L"Z", axisLengthZ);
+    DrawAxisLabel(graphics, font, textBrush, xEnd, L"X+", axisLengthX);
+    DrawAxisLabel(graphics, font, textBrush, xNegEnd, L"X-", axisLengthX);
+    DrawAxisLabel(graphics, font, textBrush, yEnd, L"Y+", axisLengthY);
+    DrawAxisLabel(graphics, font, textBrush, yNegEnd, L"Y-", axisLengthY);
+    DrawAxisLabel(graphics, font, textBrush, zEnd, L"Z+", axisLengthZ);
+    DrawAxisLabel(graphics, font, textBrush, zNegEnd, L"Z-", axisLengthZ);
 
-    // 绘制刻度线标签
-    DrawAxisTicks(graphics, font, textBrush, origin, xEnd, tickCount, true, false, false);  // X轴
-    DrawAxisTicks(graphics, font, textBrush, origin, yEnd, tickCount, false, true, false); // Y轴
-    DrawAxisTicks(graphics, font, textBrush, origin, zEnd, tickCount, false, false, true); // Z轴
+    // 绘制刻度线标签（正负方向）
+    DrawAxisTicks(graphics, font, textBrush, xNegEnd, xEnd, tickCount, true, false, false);  // X轴
+    DrawAxisTicks(graphics, font, textBrush, yNegEnd, yEnd, tickCount, false, true, false); // Y轴
+    DrawAxisTicks(graphics, font, textBrush, zNegEnd, zEnd, tickCount, false, false, true); // Z轴
 }
 
 void CSphere3DDlg::DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, SolidBrush& brush,
@@ -320,22 +354,135 @@ void CSphere3DDlg::DrawAxes()
     // X轴 (红色)
     glBegin(GL_LINES);
     glColor3f(0.8f, 0.2f, 0.2f); // 深红色
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(2.0f, 0.0f, 0.0f);
+    glVertex3f(-2.5f, 0.0f, 0.0f); // 负方向
+    glVertex3f(2.5f, 0.0f, 0.0f);  // 正方向
     glEnd();
+
+    // 绘制X轴箭头
+    DrawArrow(-2.5f, 0.0f, 0.0f, 2.5f, 0.0f, 0.0f, 0.8f, 0.2f, 0.2f);
 
     // Y轴 (绿色)
     glBegin(GL_LINES);
     glColor3f(0.2f, 0.8f, 0.2f); // 深绿色
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 2.0f, 0.0f);
+    glVertex3f(0.0f, -2.5f, 0.0f); // 负方向
+    glVertex3f(0.0f, 2.5f, 0.0f);  // 正方向
     glEnd();
+
+    // 绘制Y轴箭头
+    DrawArrow(0.0f, -2.5f, 0.0f, 0.0f, 2.5f, 0.0f, 0.2f, 0.8f, 0.2f);
 
     // Z轴 (蓝色)
     glBegin(GL_LINES);
     glColor3f(0.2f, 0.2f, 0.8f); // 深蓝色
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 2.0f);
+    glVertex3f(0.0f, 0.0f, -2.5f); // 负方向
+    glVertex3f(0.0f, 0.0f, 2.5f);  // 正方向
+    glEnd();
+
+    // 绘制Z轴箭头
+    DrawArrow(0.0f, 0.0f, -2.5f, 0.0f, 0.0f, 2.5f, 0.2f, 0.2f, 0.8f);
+}
+
+// 绘制坐标轴箭头
+void CSphere3DDlg::DrawArrow(float x1, float y1, float z1,
+    float x2, float y2, float z2,
+    float r, float g, float b)
+{
+    // 计算轴方向向量
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float dz = z2 - z1;
+
+    // 归一化方向向量
+    float length = sqrt(dx * dx + dy * dy + dz * dz);
+    if (length < 0.001f) return;
+
+    dx /= length;
+    dy /= length;
+    dz /= length;
+
+    // 箭头参数
+    float arrowLength = 0.2f;
+    float arrowWidth = 0.1f;
+
+    // 箭头尖端位置
+    float tipX = x2;
+    float tipY = y2;
+    float tipZ = z2;
+
+    // 箭头基部位置
+    float baseX = tipX - dx * arrowLength;
+    float baseY = tipY - dy * arrowLength;
+    float baseZ = tipZ - dz * arrowLength;
+
+    // 计算垂直向量
+    float perpX = 0.0f, perpY = 0.0f, perpZ = 0.0f;
+
+    // 确保选择的垂直向量方向不与原向量平行
+    if (fabs(dx) <= fabs(dy) && fabs(dx) <= fabs(dz)) {
+        // dx最小，选择X轴方向作为初始垂直向量
+        perpX = 1.0f;
+        perpY = 0.0f;
+        perpZ = 0.0f;
+    }
+    else if (fabs(dy) <= fabs(dx) && fabs(dy) <= fabs(dz)) {
+        // dy最小，选择Y轴方向作为初始垂直向量
+        perpX = 0.0f;
+        perpY = 1.0f;
+        perpZ = 0.0f;
+    }
+    else {
+        // dz最小，选择Z轴方向作为初始垂直向量
+        perpX = 0.0f;
+        perpY = 0.0f;
+        perpZ = 1.0f;
+    }
+
+    // 计算叉积得到垂直向量
+    float ux = dy * perpZ - dz * perpY;
+    float uy = dz * perpX - dx * perpZ;
+    float uz = dx * perpY - dy * perpX;
+
+    // 归一化垂直向量
+    length = sqrt(ux * ux + uy * uy + uz * uz);
+    if (length > 0.001f) {
+        ux /= length;
+        uy /= length;
+        uz /= length;
+    }
+
+    // 计算另一个垂直向量
+    float vx = dy * uz - dz * uy;
+    float vy = dz * ux - dx * uz;
+    float vz = dx * uy - dy * ux;
+
+    // 归一化
+    length = sqrt(vx * vx + vy * vy + vz * vz);
+    if (length > 0.001f) {
+        vx /= length;
+        vy /= length;
+        vz /= length;
+    }
+
+    // 绘制箭头
+    glColor3f(r, g, b);
+    glBegin(GL_TRIANGLES);
+
+    // 箭头尖端
+    glVertex3f(tipX, tipY, tipZ);
+    glVertex3f(baseX + ux * arrowWidth, baseY + uy * arrowWidth, baseZ + uz * arrowWidth);
+    glVertex3f(baseX + vx * arrowWidth, baseY + vy * arrowWidth, baseZ + vz * arrowWidth);
+
+    glVertex3f(tipX, tipY, tipZ);
+    glVertex3f(baseX - ux * arrowWidth, baseY - uy * arrowWidth, baseZ - uz * arrowWidth);
+    glVertex3f(baseX + vx * arrowWidth, baseY + vy * arrowWidth, baseZ + vz * arrowWidth);
+
+    glVertex3f(tipX, tipY, tipZ);
+    glVertex3f(baseX + ux * arrowWidth, baseY + uy * arrowWidth, baseZ + uz * arrowWidth);
+    glVertex3f(baseX - vx * arrowWidth, baseY - vy * arrowWidth, baseZ - vz * arrowWidth);
+
+    glVertex3f(tipX, tipY, tipZ);
+    glVertex3f(baseX - ux * arrowWidth, baseY - uy * arrowWidth, baseZ - uz * arrowWidth);
+    glVertex3f(baseX - vx * arrowWidth, baseY - vy * arrowWidth, baseZ - vz * arrowWidth);
     glEnd();
 }
 
@@ -368,7 +515,8 @@ void CSphere3DDlg::DrawSphere()
             float y = m_spherePoints[i][j % slices].y;
             float z = m_spherePoints[i][j % slices].z;
 
-            glVertex3f(x/1000, y / 1000, z / 10000);
+            //glVertex3f(x/1000, y / 1000, z / 10000);
+            glVertex3f(x, y, z);
         }
         glEnd();
     }
@@ -387,7 +535,8 @@ void CSphere3DDlg::DrawSphere()
             float y = m_spherePoints[k % stacks][j].y;
             float z = m_spherePoints[k % stacks][j].z;
 
-            glVertex3f(x / 1000, y / 1000, z / 10000);
+            //glVertex3f(x / 1000, y / 1000, z / 10000);
+            glVertex3f(x, y, z);
         }
         glEnd();
     }
@@ -406,6 +555,8 @@ void CSphere3DDlg::DrawSphere()
 void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {
     m_spherePoints.resize(stacks + 1);
 
+    double radius = 10;
+
     for (int i = 0; i <= stacks; ++i) {
         double phi = M_PI / 2 - i * M_PI / stacks;
         double cosPhi = cos(phi);
@@ -418,9 +569,9 @@ void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {
             double cosTheta = cos(theta);
             double sinTheta = sin(theta);
 
-            double x = cosPhi * cosTheta;
-            double y = cosPhi * sinTheta;
-            double z = sinPhi;
+            double x = radius * cosPhi * cosTheta;
+            double y = radius * cosPhi * sinTheta;
+            double z = radius * sinPhi;
 
             m_spherePoints[i][j] = Point3D(x, y, z);
         }

@@ -32,6 +32,7 @@ public:
 private:
     HGLRC m_hRC;
     CDC* m_pDC;
+    ULONG_PTR gdiplusToken;  // GDI+初始化令牌
 
     // 3D变换参数
     float m_xRot, m_yRot, m_zRot;
@@ -45,6 +46,13 @@ private:
     void InitializeOpenGL();
     void SetupProjection(int width, int height);
     void DrawScene();
+    CPoint ProjectPoint(float x, float y, float z);
+    void DrawAxisLabels();
+    void DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
+        CPoint endPoint, const wchar_t* label, int axisLength);
+    void DrawAxisTicks(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
+        CPoint startPoint, CPoint endPoint, int tickCount,
+        bool isXAxis, bool isYAxis, bool isZAxis);
     void DrawAxes();
     void DrawSphere();
 

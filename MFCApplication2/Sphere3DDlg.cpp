@@ -3,6 +3,9 @@
 //#include "Sphere3D.h"
 #include "Sphere3DDlg.h"
 #include "afxdialogex.h"
+#include <cmath>
+#include <gdiplus.h>
+using namespace Gdiplus;
 
 const double M_PI = 3.14159265358979323846;
 
@@ -14,9 +17,9 @@ CSphere3DDlg::CSphere3DDlg(CWnd* pParent)
     : CDialogEx(IDD_SPHERE3D_DIALOG, pParent)
 {
     // 初始化参数
-    m_xRot = 30.0f;
-    m_yRot = 30.0f;
-    m_zRot = 0.0f;
+    m_xRot = -45.0f;
+    m_yRot = 0.0f;
+    m_zRot = 200.0f;
     m_xTrans = 0.0f;
     m_yTrans = 0.0f;
     m_zTrans = -5.0f;
@@ -122,6 +125,10 @@ void CSphere3DDlg::InitializeOpenGL()
     CRect rect;
     m_glWindow.GetClientRect(&rect);
     SetupProjection(rect.Width(), rect.Height());
+
+    // 初始化GDI+
+    GdiplusStartupInput gdiplusStartupInput;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 }
 
 void CSphere3DDlg::SetupProjection(int width, int height)
@@ -162,6 +169,148 @@ void CSphere3DDlg::DrawScene()
     DrawSphere();
 
     SwapBuffers(m_pDC->GetSafeHdc());
+
+    // 使用GDI+绘制坐标轴标签和刻度
+    DrawAxisLabels();
+}
+
+// 将3D坐标转换为2D屏幕坐标
+CPoint CSphere3DDlg::ProjectPoint(float x, float y, float z)
+{
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLint viewport[4];
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    GLdouble winX, winY, winZ;
+    gluProject(x, y, z, modelview, projection, viewport, &winX, &winY, &winZ);
+
+    // 转换y坐标（OpenGL原点在左下，Windows在左上）
+    winY = viewport[3] - winY;
+
+    return CPoint(static_cast<int>(winX), static_cast<int>(winY));
+}
+
+void CSphere3DDlg::DrawAxisLabels()
+{
+    CDC* pDC = CDC::FromHandle(m_pDC->GetSafeHdc());
+    if (!pDC) return;
+
+    Gdiplus::Graphics graphics(pDC->GetSafeHdc());
+    graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+    graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
+
+    FontFamily fontFamily(L"Arial");
+    Gdiplus::Font font(&fontFamily, 12, FontStyleRegular, UnitPixel);
+    SolidBrush textBrush(Color(0, 0, 0)); // 黑色文本
+
+    StringFormat stringFormat;
+    stringFormat.SetAlignment(StringAlignmentCenter);
+    stringFormat.SetLineAlignment(StringAlignmentCenter);
+
+    // 获取坐标轴端点的屏幕坐标
+    CPoint origin = ProjectPoint(0, 0, 0);
+    CPoint xEnd = ProjectPoint(2.0f, 0, 0);
+    CPoint yEnd = ProjectPoint(0, 2.0f, 0);
+    CPoint zEnd = ProjectPoint(0, 0, 2.0f);
+
+    // 计算坐标轴长度（像素）
+    int axisLengthX = static_cast<int>(sqrt(pow(xEnd.x - origin.x, 2) + pow(xEnd.y - origin.y, 2)));
+    int axisLengthY = static_cast<int>(sqrt(pow(yEnd.x - origin.x, 2) + pow(yEnd.y - origin.y, 2)));
+    int axisLengthZ = static_cast<int>(sqrt(pow(zEnd.x - origin.x, 2) + pow(zEnd.y - origin.y, 2)));
+
+    // 确定刻度间隔（基于坐标轴长度）
+    int maxAxisLength = max(axisLengthX, max(axisLengthY, axisLengthZ));
+    int tickCount = max(4, maxAxisLength / 50); // 每50像素一个刻度
+
+    // 绘制坐标轴标签
+    DrawAxisLabel(graphics, font, textBrush, xEnd, L"X", axisLengthX);
+    DrawAxisLabel(graphics, font, textBrush, yEnd, L"Y", axisLengthY);
+    DrawAxisLabel(graphics, font, textBrush, zEnd, L"Z", axisLengthZ);
+
+    // 绘制刻度线标签
+    DrawAxisTicks(graphics, font, textBrush, origin, xEnd, tickCount, true, false, false);  // X轴
+    DrawAxisTicks(graphics, font, textBrush, origin, yEnd, tickCount, false, true, false); // Y轴
+    DrawAxisTicks(graphics, font, textBrush, origin, zEnd, tickCount, false, false, true); // Z轴
+}
+
+void CSphere3DDlg::DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, SolidBrush& brush,
+    CPoint endPoint, const wchar_t* label, int axisLength)
+{
+    // 计算标签位置（在轴端点外偏移）
+    int offset = max(15, axisLength / 20);
+
+    // 计算偏移方向（基于轴方向）
+    int dx = endPoint.x - ProjectPoint(0, 0, 0).x;
+    int dy = endPoint.y - ProjectPoint(0, 0, 0).y;
+
+    // 归一化方向向量
+    float length = sqrt(dx * dx + dy * dy);
+    if (length > 0) {
+        dx = static_cast<int>(dx / length * offset);
+        dy = static_cast<int>(dy / length * offset);
+    }
+
+    RectF rect(endPoint.x + dx - 15, endPoint.y + dy - 15, 30, 30);
+    graphics.DrawString(label, -1, &font, rect, &StringFormat(), &brush);
+}
+
+void CSphere3DDlg::DrawAxisTicks(Graphics& graphics, Gdiplus::Font& font, SolidBrush& brush,
+    CPoint startPoint, CPoint endPoint, int tickCount,
+    bool isXAxis, bool isYAxis, bool isZAxis)
+{
+    // 计算轴向量
+    float dx = static_cast<float>(endPoint.x - startPoint.x);
+    float dy = static_cast<float>(endPoint.y - startPoint.y);
+
+    // 计算刻度方向（垂直于轴）
+    float perpX = -dy;
+    float perpY = dx;
+
+    // 归一化垂直向量
+    float length = sqrt(perpX * perpX + perpY * perpY);
+    if (length > 0) {
+        perpX /= length;
+        perpY /= length;
+    }
+
+    // 刻度线长度
+    int tickLength = 8;
+
+    // 绘制刻度线和标签
+    for (int i = 1; i <= tickCount; i++) {
+        // 计算刻度位置（0.0到2.0之间）
+        float t = static_cast<float>(i) / tickCount;
+        float value = t * 2.0f;
+
+        // 计算屏幕位置
+        float px = startPoint.x + dx * t;
+        float py = startPoint.y + dy * t;
+
+        // 绘制刻度线
+        CPoint tickStart(static_cast<int>(px), static_cast<int>(py));
+        CPoint tickEnd(static_cast<int>(px + perpX * tickLength),
+            static_cast<int>(py + perpY * tickLength));
+
+        Pen pen(Color(100, 100, 100), 1.0f);
+        graphics.DrawLine(&pen, tickStart.x, tickStart.y, tickEnd.x, tickEnd.y);
+
+        // 绘制刻度值
+        CString valueStr;
+        valueStr.Format(_T("%.1f"), value);
+
+        // 计算文本位置（在刻度线外偏移）
+        int textOffsetX = static_cast<int>(perpX * (tickLength + 5));
+        int textOffsetY = static_cast<int>(perpY * (tickLength + 5));
+
+        RectF rect(tickEnd.x + textOffsetX - 20,
+            tickEnd.y + textOffsetY - 10,
+            40, 20);
+        graphics.DrawString(valueStr, -1, &font, rect, &StringFormat(), &brush);
+    }
 }
 
 void CSphere3DDlg::DrawAxes()
@@ -173,13 +322,6 @@ void CSphere3DDlg::DrawAxes()
     glColor3f(0.8f, 0.2f, 0.2f); // 深红色
     glVertex3f(0.0f, 0.0f, 0.0f);
     glVertex3f(2.0f, 0.0f, 0.0f);
-
-    // 刻度线
-    glColor3f(0.5f, 0.0f, 0.0f); // 稍浅的红色
-    for (float i = 0.5f; i < 2.0f; i += 0.5f) {
-        glVertex3f(i, -0.05f, 0.0f);
-        glVertex3f(i, 0.05f, 0.0f);
-    }
     glEnd();
 
     // Y轴 (绿色)
@@ -187,13 +329,6 @@ void CSphere3DDlg::DrawAxes()
     glColor3f(0.2f, 0.8f, 0.2f); // 深绿色
     glVertex3f(0.0f, 0.0f, 0.0f);
     glVertex3f(0.0f, 2.0f, 0.0f);
-
-    // 刻度线
-    glColor3f(0.0f, 0.5f, 0.0f); // 稍浅的绿色
-    for (float i = 0.5f; i < 2.0f; i += 0.5f) {
-        glVertex3f(-0.05f, i, 0.0f);
-        glVertex3f(0.05f, i, 0.0f);
-    }
     glEnd();
 
     // Z轴 (蓝色)
@@ -201,23 +336,7 @@ void CSphere3DDlg::DrawAxes()
     glColor3f(0.2f, 0.2f, 0.8f); // 深蓝色
     glVertex3f(0.0f, 0.0f, 0.0f);
     glVertex3f(0.0f, 0.0f, 2.0f);
-
-    // 刻度线
-    glColor3f(0.0f, 0.0f, 0.5f); // 稍浅的蓝色
-    for (float i = 0.5f; i < 2.0f; i += 0.5f) {
-        glVertex3f(-0.05f, 0.0f, i);
-        glVertex3f(0.05f, 0.0f, i);
-    }
     glEnd();
-
-    // 绘制轴标签
-    glColor3f(0.0f, 0.0f, 0.0f); // 黑色标签
-    glRasterPos3f(2.1f, 0.0f, 0.0f);
-    //m_glWindow.TextOut(0, 0, "X");
-    glRasterPos3f(0.0f, 2.1f, 0.0f);
-    //m_glWindow.TextOut(0, 0, "Y");
-    glRasterPos3f(0.0f, 0.0f, 2.1f);
-    //m_glWindow.TextOut(0, 0, "Z");
 }
 
 void CSphere3DDlg::DrawSphere()
@@ -443,7 +562,7 @@ void CSphere3DDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
         if (pos > 360) pos = 360;
 
         m_rotationScroll.SetScrollPos(pos);
-        m_yRot = static_cast<float>(pos);
+        m_zRot = static_cast<float>(pos);
         DrawScene();
     }
 

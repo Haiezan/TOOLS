@@ -34,7 +34,7 @@ CSphere3DDlg::~CSphere3DDlg()
 void CSphere3DDlg::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_OPENGL_WINDOW, m_glWindow);
+    DDX_Control(pDX, IDC_STATIC_PIC, m_glWindow);
     DDX_Control(pDX, IDC_ROTATION_SCROLL, m_rotationScroll);
 }
 

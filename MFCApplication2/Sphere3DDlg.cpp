@@ -193,7 +193,7 @@ void CSphere3DDlg::DrawScene()
 
     // 绘制坐标轴和球体
     DrawAxes();
-    GenerateSphereData(10, 36);
+    //GenerateSphereData(10, 36);
     DrawSphere();
 
     SwapBuffers(m_pDC->GetSafeHdc());
@@ -592,6 +592,17 @@ BOOL CSphere3DDlg::OnEraseBkgnd(CDC* pDC)
 void CSphere3DDlg::OnSize(UINT nType, int cx, int cy)
 {
     CDialogEx::OnSize(nType, cx, cy);
+
+    if (IsWindow(m_glWindow))
+    {
+        // 设置OpenGL窗口位置和大小
+        m_glWindow.SetWindowPos(NULL,
+            0,
+            0,
+            cx,
+            cy,
+            SWP_NOZORDER);
+    }
 
     if (m_glWindow.GetSafeHwnd() && m_pDC && m_hRC)
     {

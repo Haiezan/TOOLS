@@ -3,7 +3,9 @@
 //
 
 #pragma once
-
+#include <string>
+#include <vector>
+#include "Sphere3DDlg.h"
 
 // CMFCApplication2Dlg 对话框
 class CMFCApplication2Dlg : public CDialogEx
@@ -32,4 +34,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
+
+	std::vector < std::vector<Point3D>> m_pointCloud;
+	bool LoadPointDataFromFile(const std::wstring& filename);
+
+	std::vector < std::vector<Point3D>> m_pointSurface;
+	int nLatitudeLines; //维度
+	int nLongitudeLines; //经度
+	bool InterpilateSurface(int nLongitudeLines, int nLatitudeLines);
+	float LinearInterpolation(const std::vector<float>& x,
+		const std::vector<float>& y, float xi);
 };

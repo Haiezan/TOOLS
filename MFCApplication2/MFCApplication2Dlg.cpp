@@ -93,6 +93,223 @@ HCURSOR CMFCApplication2Dlg::OnQueryDragIcon()
 void CMFCApplication2Dlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+	LoadPointDataFromFile(L"D:\\Github\\TOOLS\\MFCApplication1\\B8527\\PMM_RD.dat");
+
+	nLongitudeLines = m_pointCloud.size();
+	nLatitudeLines = m_pointCloud[0].size();
+
+	InterpilateSurface(nLongitudeLines, nLatitudeLines);
+
 	CSphere3DDlg dlg;
+	dlg.m_spherePoints = m_pointSurface;
 	dlg.DoModal();
+}
+
+#include <fstream>
+#include <sstream>
+#include <locale>
+#include <codecvt>
+#include <iomanip>
+
+// 从文本文件加载点数据
+bool CMFCApplication2Dlg::LoadPointDataFromFile(const std::wstring& filename) {
+	// 清空现有数据
+	m_pointCloud.clear();
+	m_pointCloud.resize(36);
+	// 打开文件
+	std::wifstream file(filename);
+	if (!file.is_open()) {
+		AfxMessageBox(_T("无法打开文件"));
+		return false;
+	}
+
+	// 设置UTF-8本地化（支持中文路径）
+	//std::locale utf8_locale(std::locale(), new std::codecvt_utf8<wchar_t>);
+	//file.imbue(utf8_locale);
+
+	std::wstring line;
+	int lineNum = 0;
+	std::getline(file, line);
+
+	while (std::getline(file, line)) {
+		lineNum++;
+
+		// 跳过空行和注释行（以#开头）
+		if (line.empty() || line[0] == L'#') {
+			continue;
+		}
+
+		std::wistringstream iss(line);
+		Point3D point;
+		wchar_t sep;
+
+		// 尝试读取三种常见格式：
+		// 1. x y z
+		// 2. x,y,z
+		// 3. x; y; z
+
+		// 尝试空格分隔
+		for (int ii = 0; ii < 36; ii++)
+		{
+			if (iss >> point.x >> point.y >> point.z) {
+				m_pointCloud[ii].push_back(point);
+			}
+		}
+		continue;
+
+		// 清除错误状态
+		iss.clear();
+		iss.seekg(0);
+
+		// 尝试逗号分隔
+		if (iss >> point.x >> sep >> point.y >> sep >> point.z && (sep == L',' || sep == L';')) {
+			m_pointCloud[0].push_back(point);
+			continue;
+		}
+
+		// 如果都不成功，报告错误行
+		CString msg;
+		msg.Format(_T("第%d行数据格式错误: %s"), lineNum, line.c_str());
+		AfxMessageBox(msg);
+	}
+
+	file.close();
+
+	if (m_pointCloud.empty()) {
+		AfxMessageBox(_T("文件未包含有效数据"));
+		return false;
+	}
+
+
+	return true;
+}
+
+bool CMFCApplication2Dlg::InterpilateSurface(int nLongitudeLines, int nLatitudeLines)
+{
+	//计算极值
+	float minX, maxX;
+	float minY, maxY;
+	float minZ, maxZ;
+	for (int i = 0; i < m_pointCloud.size(); i++)
+	{
+		for (int j = 0; j < m_pointCloud[i].size(); j++)
+		{
+			if (i == 0 && j == 0)
+			{
+				minX = maxX = m_pointCloud[i][j].x;
+				minY = maxY = m_pointCloud[i][j].y;
+				minZ = maxZ = m_pointCloud[i][j].z;
+			}
+			else
+			{
+				minX = min(minX, m_pointCloud[i][j].x);
+				maxX = max(maxX, m_pointCloud[i][j].x);
+
+				minY = min(minY, m_pointCloud[i][j].y);
+				maxY = max(maxY, m_pointCloud[i][j].y);
+
+				minZ = min(minZ, m_pointCloud[i][j].z);
+				maxZ = max(maxZ, m_pointCloud[i][j].z);
+			}
+		}
+	}
+
+	//计算坐标
+	m_pointSurface.clear();
+	m_pointSurface.resize(nLongitudeLines);
+
+	float dZ = (maxZ - minZ) / (nLatitudeLines - 1);
+	for (int i = 0; i < nLongitudeLines; ++i)
+	{
+		m_pointSurface[i].resize(nLatitudeLines);
+
+		std::vector<float> xx, yy, zz;
+		xx.clear();
+		yy.clear();
+		zz.clear();
+		for (int j = 0; j < nLatitudeLines; j++)
+		{
+			xx.push_back(m_pointCloud[i][j].x);
+			yy.push_back(m_pointCloud[i][j].y);
+			zz.push_back(m_pointCloud[i][j].z);
+		}
+
+		float Z = minZ;
+		for (int j = 0; j < nLatitudeLines; j++)
+		{
+			float X = LinearInterpolation(zz, xx, Z);
+			float Y = LinearInterpolation(zz, yy, Z);
+			m_pointSurface[i][j] = Point3D(X, Y, Z);
+			Z += dZ;
+		}
+	}
+
+	//写文件
+	std::ofstream outFile("Surface");
+	if (!outFile.is_open())
+	{
+		return FALSE;
+	}
+
+	// 设置输出精度
+	outFile.precision(6);
+	outFile << std::fixed;
+
+	// 写入表头
+	outFile << "Longitude Index | Latitude Index | X Coordinate | Y Coordinate | Z Coordinate\n";
+	outFile << "----------------------------------------------------------------------------\n";
+
+	// 写入插值结果
+	for (size_t i = 0; i < m_pointSurface.size(); ++i)
+	{
+		for (size_t j = 0; j < m_pointSurface[i].size(); ++j)
+		{
+			const Point3D& pt = m_pointSurface[i][j];
+			outFile << std::setw(16) << j << " | "
+				<< std::setw(15) << i << " | "
+				<< std::setw(13) << pt.x << " | "
+				<< std::setw(13) << pt.y << " | "
+				<< std::setw(13) << pt.z << "\n";
+		}
+	}
+
+	outFile.close();
+
+	return 1;
+}
+
+float CMFCApplication2Dlg::LinearInterpolation(const std::vector<float>& x,
+	const std::vector<float>& y, float xi) {
+	// 检查输入有效性
+	if (x.size() != y.size()) {
+		throw std::invalid_argument("x and y vectors must be of the same size");
+	}
+	if (x.empty()) {
+		throw std::invalid_argument("Input vectors cannot be empty");
+	}
+	if (xi < x.front()) {
+		return y.front();
+	}
+	if (xi > x.back()) {
+		return y.back();
+	}
+
+	// 查找xi所在的区间
+	size_t i = 0;
+	while (i < x.size() - 1 && x[i + 1] < xi) {
+		++i;
+	}
+
+	// 如果是正好等于某个点，直接返回对应的y值
+	if (xi == x[i]) {
+		return y[i];
+	}
+	if (i < x.size() - 1 && xi == x[i + 1]) {
+		return y[i + 1];
+	}
+
+	// 线性插值公式: y = y0 + (y1-y0)*(x-x0)/(x1-x0)
+	double slope = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
+	return y[i] + slope * (xi - x[i]);
 }

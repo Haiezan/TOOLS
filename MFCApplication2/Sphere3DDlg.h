@@ -3,6 +3,13 @@
 #include "afxdialogex.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
+#include <vector>
+
+struct Point3D 
+{
+    double x, y, z;
+    Point3D(double _x = 0, double _y = 0, double _z = 0) : x(_x), y(_y), z(_z) {}
+};
 
 class CSphere3DDlg : public CDialogEx
 {
@@ -52,4 +59,8 @@ public:
     afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
     afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
     afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+
+    //曲面坐标
+    void GenerateSphereData(int slices, int stacks);
+    std::vector<std::vector<Point3D>> m_spherePoints;
 };

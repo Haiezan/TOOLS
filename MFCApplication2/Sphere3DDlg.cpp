@@ -17,7 +17,7 @@ CSphere3DDlg::CSphere3DDlg(CWnd* pParent)
     : CDialogEx(IDD_SPHERE3D_DIALOG, pParent)
 {
     // 初始化参数
-    m_xRot = -45.0f;
+    m_xRot = 0.0f;
     m_yRot = 0.0f;
     m_zRot = 200.0f;
     m_xTrans = 0.0f;
@@ -62,6 +62,8 @@ BOOL CSphere3DDlg::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
+    GenerateSphereData(36, 36);
+
     // 设置滚动条范围 (0-360度)
     m_rotationScroll.SetScrollRange(0, 360);
     m_rotationScroll.SetScrollPos(static_cast<int>(m_yRot));
@@ -90,6 +92,16 @@ BOOL CSphere3DDlg::OnInitDialog()
             }
         }
     }
+
+    //计算缩放比例
+    float org = 1.5f;
+    //org = maxX;
+    scaleX = org / maxX;
+    scaleY = org / maxY;
+    scaleZ = org / maxZ;
+
+    //计算坐标轴长度
+    axisLength = maxX * 1.5f * scaleX;
 
     // 初始化OpenGL
     InitializeOpenGL();
@@ -191,15 +203,16 @@ void CSphere3DDlg::DrawScene()
     glRotatef(m_yRot, 0.0f, 1.0f, 0.0f);
     glRotatef(m_zRot, 0.0f, 0.0f, 1.0f);
 
-    // 绘制坐标轴和球体
-    DrawAxes();
-    //GenerateSphereData(10, 36);
+    // 绘制曲面
     DrawSphere();
+
+    DrawAxes();
 
     SwapBuffers(m_pDC->GetSafeHdc());
 
-    // 使用GDI+绘制坐标轴标签和刻度
-    DrawAxisLabels();
+    //绘制坐标轴和标签
+    DrawAxisLabels(); // 使用GDI+绘制坐标轴标签和刻度
+
 }
 
 // 将3D坐标转换为2D屏幕坐标
@@ -214,12 +227,14 @@ CPoint CSphere3DDlg::ProjectPoint(float x, float y, float z)
     glGetIntegerv(GL_VIEWPORT, viewport);
 
     GLdouble winX, winY, winZ;
-    gluProject(x, y, z, modelview, projection, viewport, &winX, &winY, &winZ);
+    if (gluProject(x, y, z, modelview, projection, viewport, &winX, &winY, &winZ)) {
+        // 转换y坐标（OpenGL原点在左下，Windows在左上）
+        winY = viewport[3] - winY;
+        return CPoint(static_cast<int>(winX), static_cast<int>(winY));
+    }
 
-    // 转换y坐标（OpenGL原点在左下，Windows在左上）
-    winY = viewport[3] - winY;
-
-    return CPoint(static_cast<int>(winX), static_cast<int>(winY));
+    // 投影失败时返回无效点
+    return CPoint(INT_MIN, INT_MIN);
 }
 
 void CSphere3DDlg::DrawAxisLabels()
@@ -241,12 +256,12 @@ void CSphere3DDlg::DrawAxisLabels()
 
     // 获取坐标轴端点的屏幕坐标
     CPoint origin = ProjectPoint(0, 0, 0);
-    CPoint xEnd = ProjectPoint(2.5f, 0, 0);
-    CPoint xNegEnd = ProjectPoint(-2.5f, 0, 0);
-    CPoint yEnd = ProjectPoint(0, 2.5f, 0);
-    CPoint yNegEnd = ProjectPoint(0, -2.5f, 0);
-    CPoint zEnd = ProjectPoint(0, 0, 2.5f);
-    CPoint zNegEnd = ProjectPoint(0, 0, -2.5f);
+    CPoint xEnd = ProjectPoint(axisLength, 0, 0);
+    CPoint xNegEnd = ProjectPoint(-axisLength, 0, 0);
+    CPoint yEnd = ProjectPoint(0, axisLength, 0);
+    CPoint yNegEnd = ProjectPoint(0, -axisLength, 0);
+    CPoint zEnd = ProjectPoint(0, 0, axisLength);
+    CPoint zNegEnd = ProjectPoint(0, 0, -axisLength);
 
     // 计算坐标轴长度（像素）
     int axisLengthX = static_cast<int>(sqrt(pow(xEnd.x - xNegEnd.x, 2) + pow(xEnd.y - xNegEnd.y, 2)));
@@ -254,8 +269,12 @@ void CSphere3DDlg::DrawAxisLabels()
     int axisLengthZ = static_cast<int>(sqrt(pow(zEnd.x - zNegEnd.x, 2) + pow(zEnd.y - zNegEnd.y, 2)));
 
     // 确定刻度间隔（基于坐标轴长度）
-    int maxAxisLength = max(axisLengthX, max(axisLengthY, axisLengthZ));
-    int tickCount = max(5, maxAxisLength / 50); // 每50像素一个刻度
+    //int maxAxisLength = max(axisLengthX, max(axisLengthY, axisLengthZ));
+    //int tickCount = max(10, maxAxisLength / 50); // 每50像素一个刻度
+    int tickCount[3] = { 30,30,30 };
+    tickCount[0] = max(10, axisLengthX / 100);
+    tickCount[1] = max(10, axisLengthY / 100);
+    tickCount[2] = max(10, axisLengthZ / 100);
 
     // 绘制坐标轴标签
     DrawAxisLabel(graphics, font, textBrush, xEnd, L"X+", axisLengthX);
@@ -266,9 +285,9 @@ void CSphere3DDlg::DrawAxisLabels()
     DrawAxisLabel(graphics, font, textBrush, zNegEnd, L"Z-", axisLengthZ);
 
     // 绘制刻度线标签（正负方向）
-    DrawAxisTicks(graphics, font, textBrush, xNegEnd, xEnd, tickCount, true, false, false);  // X轴
-    DrawAxisTicks(graphics, font, textBrush, yNegEnd, yEnd, tickCount, false, true, false); // Y轴
-    DrawAxisTicks(graphics, font, textBrush, zNegEnd, zEnd, tickCount, false, false, true); // Z轴
+    DrawAxisTicks(graphics, font, textBrush, xNegEnd, xEnd, tickCount[0], true, false, false);  // X轴
+    DrawAxisTicks(graphics, font, textBrush, yNegEnd, yEnd, tickCount[1], false, true, false); // Y轴
+    DrawAxisTicks(graphics, font, textBrush, zNegEnd, zEnd, tickCount[2], false, false, true); // Z轴
 }
 
 void CSphere3DDlg::DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, SolidBrush& brush,
@@ -296,53 +315,59 @@ void CSphere3DDlg::DrawAxisTicks(Graphics& graphics, Gdiplus::Font& font, SolidB
     CPoint startPoint, CPoint endPoint, int tickCount,
     bool isXAxis, bool isYAxis, bool isZAxis)
 {
-    // 计算轴向量
-    float dx = static_cast<float>(endPoint.x - startPoint.x);
-    float dy = static_cast<float>(endPoint.y - startPoint.y);
+    // 计算轴起点和终点在3D世界空间中的坐标
+    float startX = 0.0f, startY = 0.0f, startZ = 0.0f;
+    float endX = 0.0f, endY = 0.0f, endZ = 0.0f;
 
-    // 计算刻度方向（垂直于轴）
-    float perpX = -dy;
-    float perpY = dx;
-
-    // 归一化垂直向量
-    float length = sqrt(perpX * perpX + perpY * perpY);
-    if (length > 0) {
-        perpX /= length;
-        perpY /= length;
+    if (isXAxis) {
+        startX = -axisLength / scaleX;
+        endX = axisLength / scaleX;
+    }
+    else if (isYAxis) {
+        startY = -axisLength / scaleY;
+        endY = axisLength / scaleY;
+    }
+    else if (isZAxis) {
+        startZ = -axisLength / scaleZ;
+        endZ = axisLength / scaleZ;
     }
 
-    // 刻度线长度
-    int tickLength = 8;
-
-    // 绘制刻度线和标签
-    for (int i = 1; i <= tickCount; i++) {
-        // 计算刻度位置（0.0到2.0之间）
+    // 刻度线方向垂直于轴，先在屏幕上再转回坐标差值方向
+    for (int i = 0; i <= tickCount; i++) {
         float t = static_cast<float>(i) / tickCount;
-        float value = t * 2.0f;
 
-        // 计算屏幕位置
-        float px = startPoint.x + dx * t;
-        float py = startPoint.y + dy * t;
+        // 3D空间插值点
+        float x = startX + t * (endX - startX);
+        float y = startY + t * (endY - startY);
+        float z = startZ + t * (endZ - startZ);
 
-        // 绘制刻度线
-        CPoint tickStart(static_cast<int>(px), static_cast<int>(py));
-        CPoint tickEnd(static_cast<int>(px + perpX * tickLength),
-            static_cast<int>(py + perpY * tickLength));
+        // 投影到2D
+        CPoint pt = ProjectPoint(x * scaleX, y * scaleY, z * scaleZ);
 
+        // 计算刻度线方向（垂直轴方向）
+        int tickLength = 8;
+        int offsetX = 0, offsetY = 0;
+
+        if (isXAxis) { offsetY = tickLength; }
+        else if (isYAxis) { offsetX = tickLength; }
+        else if (isZAxis) { offsetX = tickLength; offsetY = tickLength; }
+
+        // 画刻度线
         Pen pen(Color(100, 100, 100), 1.0f);
-        graphics.DrawLine(&pen, tickStart.x, tickStart.y, tickEnd.x, tickEnd.y);
+        graphics.DrawLine(&pen, pt.x - offsetX, pt.y - offsetY, pt.x + offsetX, pt.y + offsetY);
 
-        // 绘制刻度值
+        // 绘制文本
         CString valueStr;
-        valueStr.Format(_T("%.1f"), value);
+        float value = isXAxis ? x : (isYAxis ? y : z);
 
-        // 计算文本位置（在刻度线外偏移）
-        int textOffsetX = static_cast<int>(perpX * (tickLength + 5));
-        int textOffsetY = static_cast<int>(perpY * (tickLength + 5));
+        if (fabs(value) < 0.001f) valueStr = _T("0");
+        else if (fabs(value) < 0.1f) valueStr.Format(_T("%.4f"), value);
+        else if (fabs(value) < 1.0f) valueStr.Format(_T("%.3f"), value);
+        else if (fabs(value) < 10.0f) valueStr.Format(_T("%.2f"), value);
+        else if (fabs(value) < 1000.0f) valueStr.Format(_T("%.1f"), value);
+        else valueStr.Format(_T("%.0f"), value);
 
-        RectF rect(tickEnd.x + textOffsetX - 20,
-            tickEnd.y + textOffsetY - 10,
-            40, 20);
+        RectF rect(static_cast<REAL>(pt.x + 5), static_cast<REAL>(pt.y + 5), 50, 20);
         graphics.DrawString(valueStr, -1, &font, rect, &StringFormat(), &brush);
     }
 }
@@ -354,32 +379,32 @@ void CSphere3DDlg::DrawAxes()
     // X轴 (红色)
     glBegin(GL_LINES);
     glColor3f(0.8f, 0.2f, 0.2f); // 深红色
-    glVertex3f(-2.5f, 0.0f, 0.0f); // 负方向
-    glVertex3f(2.5f, 0.0f, 0.0f);  // 正方向
+    glVertex3f(-axisLength, 0.0f, 0.0f); // 负方向
+    glVertex3f(axisLength, 0.0f, 0.0f);  // 正方向
     glEnd();
 
     // 绘制X轴箭头
-    DrawArrow(-2.5f, 0.0f, 0.0f, 2.5f, 0.0f, 0.0f, 0.8f, 0.2f, 0.2f);
+    DrawArrow(-axisLength, 0.0f, 0.0f, axisLength, 0.0f, 0.0f, 0.8f, 0.2f, 0.2f);
 
     // Y轴 (绿色)
     glBegin(GL_LINES);
     glColor3f(0.2f, 0.8f, 0.2f); // 深绿色
-    glVertex3f(0.0f, -2.5f, 0.0f); // 负方向
-    glVertex3f(0.0f, 2.5f, 0.0f);  // 正方向
+    glVertex3f(0.0f, -axisLength, 0.0f); // 负方向
+    glVertex3f(0.0f, axisLength, 0.0f);  // 正方向
     glEnd();
 
     // 绘制Y轴箭头
-    DrawArrow(0.0f, -2.5f, 0.0f, 0.0f, 2.5f, 0.0f, 0.2f, 0.8f, 0.2f);
+    DrawArrow(0.0f, -axisLength, 0.0f, 0.0f, axisLength, 0.0f, 0.2f, 0.8f, 0.2f);
 
     // Z轴 (蓝色)
     glBegin(GL_LINES);
     glColor3f(0.2f, 0.2f, 0.8f); // 深蓝色
-    glVertex3f(0.0f, 0.0f, -2.5f); // 负方向
-    glVertex3f(0.0f, 0.0f, 2.5f);  // 正方向
+    glVertex3f(0.0f, 0.0f, -axisLength); // 负方向
+    glVertex3f(0.0f, 0.0f, axisLength);  // 正方向
     glEnd();
 
     // 绘制Z轴箭头
-    DrawArrow(0.0f, 0.0f, -2.5f, 0.0f, 0.0f, 2.5f, 0.2f, 0.2f, 0.8f);
+    DrawArrow(0.0f, 0.0f, -axisLength, 0.0f, 0.0f, axisLength, 0.2f, 0.2f, 0.8f);
 }
 
 // 绘制坐标轴箭头
@@ -515,6 +540,10 @@ void CSphere3DDlg::DrawSphere()
             float y = m_spherePoints[i][j % slices].y;
             float z = m_spherePoints[i][j % slices].z;
 
+            x *= scaleX;
+            y *= scaleY;
+            z *= scaleZ;
+
             //glVertex3f(x/1000, y / 1000, z / 10000);
             glVertex3f(x, y, z);
         }
@@ -534,6 +563,10 @@ void CSphere3DDlg::DrawSphere()
             float x = m_spherePoints[k % stacks][j].x;
             float y = m_spherePoints[k % stacks][j].y;
             float z = m_spherePoints[k % stacks][j].z;
+
+            x *= scaleX;
+            y *= scaleY;
+            z *= scaleZ;
 
             //glVertex3f(x / 1000, y / 1000, z / 10000);
             glVertex3f(x, y, z);
@@ -555,7 +588,7 @@ void CSphere3DDlg::DrawSphere()
 void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {
     m_spherePoints.resize(stacks + 1);
 
-    double radius = 10;
+    double radius = 2000;
 
     for (int i = 0; i <= stacks; ++i) {
         double phi = M_PI / 2 - i * M_PI / stacks;

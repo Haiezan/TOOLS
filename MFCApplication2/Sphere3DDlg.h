@@ -47,6 +47,7 @@ private:
     void SetupProjection(int width, int height);
     void DrawScene();
     CPoint ProjectPoint(float x, float y, float z);
+
     void DrawAxisLabels();
     void DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
         CPoint endPoint, const wchar_t* label, int axisLength);
@@ -75,4 +76,6 @@ public:
     void GenerateSphereData(int slices, int stacks);
     std::vector<std::vector<Point3D>> m_spherePoints;
     float maxX, minX, maxY, minY, maxZ, minZ;
+    float scaleX, scaleY , scaleZ;
+    float axisLength;
 };

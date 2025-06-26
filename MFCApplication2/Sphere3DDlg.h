@@ -78,5 +78,7 @@ public:
     std::vector<std::vector<Point3D>> m_spherePoints;
     float maxX, minX, maxY, minY, maxZ, minZ;
     float scaleX, scaleY , scaleZ;
-    float axisLengthX, axisLengthY, axisLengthZ;
+    float axisLengthX, axisLengthXNeg;
+    float axisLengthY, axisLengthYNeg;
+    float axisLengthZ, axisLengthZNeg;
 };

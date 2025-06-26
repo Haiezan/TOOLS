@@ -52,8 +52,9 @@ private:
     void DrawAxisLabel(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
         CPoint endPoint, const wchar_t* label, int axisLength);
     void DrawAxisTicks(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
-        CPoint startPoint, CPoint endPoint, int tickCount,
+        CPoint startPoint2D, CPoint endPoint2D,
         bool isXAxis, bool isYAxis, bool isZAxis);
+    float ComputeTickSpacing(float axisWorldLength);
     void DrawAxes();
     void DrawArrow(float x1, float y1, float z1,
         float x2, float y2, float z2,
@@ -77,5 +78,5 @@ public:
     std::vector<std::vector<Point3D>> m_spherePoints;
     float maxX, minX, maxY, minY, maxZ, minZ;
     float scaleX, scaleY , scaleZ;
-    float axisLength;
+    float axisLengthX, axisLengthY, axisLengthZ;
 };

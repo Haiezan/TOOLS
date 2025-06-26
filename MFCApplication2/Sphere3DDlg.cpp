@@ -448,8 +448,9 @@ void CSphere3DDlg::DrawArrow(float x1, float y1, float z1,
     dz /= length;
 
     // 箭头参数
-    float arrowLength = 0.2f;
-    float arrowWidth = 0.1f;
+    float baseArrowSize = 0.1f;
+    float arrowLength = baseArrowSize * m_zoom;
+    float arrowWidth = (baseArrowSize * 0.5f) * m_zoom;
 
     // 箭头尖端位置
     float tipX = x2;
@@ -698,6 +699,16 @@ void CSphere3DDlg::OnLButtonDown(UINT nFlags, CPoint point)
         SetCapture();
     }
 
+    //点击点位置判断
+    int hitRadius = 10;
+    CPoint xArrowScreen = ProjectPoint(axisLengthX, 0, 0); // 屏幕位置
+    if (abs(point.x - xArrowScreen.x) <= hitRadius &&
+        abs(point.y - xArrowScreen.y) <= hitRadius)
+    {
+        m_bDraggingXArrow = true;
+        SetCapture();
+    }
+
     CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -705,6 +716,10 @@ void CSphere3DDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
     if (m_bDragging) {
         m_bDragging = false;
+        ReleaseCapture();
+    }
+    if (m_bDraggingXArrow) {
+        m_bDraggingXArrow = false;
         ReleaseCapture();
     }
     CDialogEx::OnLButtonUp(nFlags, point);
@@ -726,7 +741,15 @@ void CSphere3DDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
     if (m_bDragging)
     {
-        if (nFlags & MK_CONTROL)
+        if (m_bDraggingXArrow) 
+        {
+            int dx = point.x - m_prevPoint.x;
+            int dy = point.y - m_prevPoint.y;
+            //if (abs(dx) > abs(dy)) m_yRot += dx * 0.5f; // 横向拖动：绕 Y 轴
+            //else m_zRot += dy * 0.5f;                   // 纵向拖动：绕 Z 轴
+            m_xRot += dx;
+        }
+        else if (nFlags & MK_CONTROL)
         {
             // 平移
             m_xTrans += (point.x - m_prevPoint.x) * 0.01f;

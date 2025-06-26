@@ -73,6 +73,8 @@ public:
     afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
     afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
+    bool m_bDraggingXArrow = false;
+
     //曲面坐标
     void GenerateSphereData(int slices, int stacks);
     std::vector<std::vector<Point3D>> m_spherePoints;

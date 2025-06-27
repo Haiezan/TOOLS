@@ -540,25 +540,16 @@ void CSphere3DDlg::DrawSphere()
     glColor3f(0.0f, 0.0f, 0.0f);
     glLineWidth(1.0f);
 
-    const float radius = 0.8f; // 球体半径
-    const int stacks = m_spherePoints.size();     // 经度分段数
-    const int slices = m_spherePoints[0].size();     // 纬度分段数
+    const int stacks = m_spherePoints.size();     // 经线数
+    const int slices = m_spherePoints[0].size();     // 纬线数
 
     // 生成并绘制球体顶点
-    for (int i = 0; i < stacks; ++i) {
-        // 当前纬度和下一纬度的角度
-        float phi1 = static_cast<float>(i) * M_PI / static_cast<float>(stacks);
-        float phi2 = static_cast<float>(i + 1) * M_PI / static_cast<float>(stacks);
-
+    for (int i = 0; i < stacks; ++i) 
+    {
         // 绘制纬线（水平圆）
         glBegin(GL_LINE_LOOP);
-        for (int j = 0; j <= slices; ++j) {
-            float theta = static_cast<float>(j) * 2.0f * M_PI / static_cast<float>(slices);
-
-            // 计算当前纬度的顶点坐标
-            /*float x = radius * sin(phi1) * cos(theta);
-            float y = radius * sin(phi1) * sin(theta);
-            float z = radius * cos(phi1);*/
+        for (int j = 0; j <= slices; ++j) 
+        {
             float x = m_spherePoints[i][j % slices].x;
             float y = m_spherePoints[i][j % slices].y;
             float z = m_spherePoints[i][j % slices].z;
@@ -567,22 +558,16 @@ void CSphere3DDlg::DrawSphere()
             y *= scaleY;
             z *= scaleZ;
 
-            //glVertex3f(x/1000, y / 1000, z / 10000);
             glVertex3f(x, y, z);
         }
         glEnd();
     }
     // 绘制经线（从北极到南极的弧线）
-    for (int j = 0; j < slices; j++) {
+    for (int j = 0; j < slices; j++) 
+    {
         glBegin(GL_LINE_STRIP);
-        for (int k = 0; k <= stacks; ++k) {
-            float phi = static_cast<float>(k) * M_PI / static_cast<float>(stacks);
-            float theta = static_cast<float>(j) * 2.0f * M_PI / static_cast<float>(slices);
-
-            // 计算顶点坐标
-            /*float x = radius * sin(phi) * cos(theta);
-            float y = radius * sin(phi) * sin(theta);
-            float z = radius * cos(phi);*/
+        for (int k = 0; k <= stacks; ++k) 
+        {
             float x = m_spherePoints[k % stacks][j].x;
             float y = m_spherePoints[k % stacks][j].y;
             float z = m_spherePoints[k % stacks][j].z;
@@ -591,21 +576,10 @@ void CSphere3DDlg::DrawSphere()
             y *= scaleY;
             z *= scaleZ;
 
-            //glVertex3f(x / 1000, y / 1000, z / 10000);
             glVertex3f(x, y, z);
         }
         glEnd();
     }
-
-    // 绘制北极点
-    glBegin(GL_POINTS);
-    glVertex3f(0.0f, 0.0f, radius);
-    glEnd();
-
-    // 绘制南极点
-    glBegin(GL_POINTS);
-    glVertex3f(0.0f, 0.0f, -radius);
-    glEnd();
 }
 
 void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {

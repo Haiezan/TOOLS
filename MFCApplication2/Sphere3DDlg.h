@@ -62,6 +62,12 @@ private:
 
     void DrawSphere();
     void DrawForcePoints();
+    void DrawLegend();
+
+    //图例
+    CPoint m_legendPos = CPoint(10, 10);   // 图例初始位置（左上角）
+    CSize  m_legendSize = CSize(120, 60);  // 图例区域大小
+    bool   m_bDraggingLegend = false;
 
 public:
     afx_msg void OnPaint();

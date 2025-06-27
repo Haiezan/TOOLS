@@ -221,6 +221,9 @@ void CSphere3DDlg::DrawScene()
     //绘制坐标轴和标签
     DrawAxisLabels(); // 使用GDI+绘制坐标轴标签和刻度
 
+    //绘制图例
+    DrawLegend();
+
 }
 
 // 将3D坐标转换为2D屏幕坐标
@@ -599,6 +602,38 @@ void CSphere3DDlg::DrawForcePoints()
     glEnd();
 }
 
+void CSphere3DDlg::DrawLegend()
+{
+    CDC* pDC = CDC::FromHandle(m_pDC->GetSafeHdc());
+    if (!pDC) return;
+
+    Gdiplus::Graphics graphics(pDC->GetSafeHdc());
+    graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+    graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
+
+    FontFamily fontFamily(L"Arial");
+    Gdiplus::Font font(&fontFamily, 12, FontStyleRegular, UnitPixel);
+    SolidBrush brush(Color(0, 0, 0));
+    Pen blackPen(Color(0, 0, 0));
+    SolidBrush whiteBrush(Color(255, 255, 255));
+
+    // 背景框
+    Rect rect(m_legendPos.x, m_legendPos.y, m_legendSize.cx, m_legendSize.cy);
+    graphics.FillRectangle(&whiteBrush, rect);
+    graphics.DrawRectangle(&blackPen, rect);
+
+    // 示例线条（球面线）
+    Pen grayPen(Color(128, 128, 128), 2.0f);
+    graphics.DrawLine(&grayPen, m_legendPos.x + 10, m_legendPos.y + 15, m_legendPos.x + 40, m_legendPos.y + 15);
+    graphics.DrawString(L"PMM曲线", -1, &font, PointF(m_legendPos.x + 50, m_legendPos.y + 8), &brush);
+
+    // 示例点（力点）
+    SolidBrush redBrush(Color(255, 0, 0));
+    graphics.FillEllipse(&redBrush, m_legendPos.x + 10, m_legendPos.y + 35, 8, 8);
+    graphics.DrawString(L"内力", -1, &font, PointF(m_legendPos.x + 50, m_legendPos.y + 30), &brush);
+}
+
+
 
 void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {
     m_spherePoints.resize(stacks + 1);
@@ -701,6 +736,12 @@ void CSphere3DDlg::OnLButtonDown(UINT nFlags, CPoint point)
         SetCapture();
     }
 
+    if (CRect(m_legendPos, m_legendSize).PtInRect(point)) {
+        m_bDraggingLegend = true;
+        m_prevPoint = point;
+        SetCapture();
+    }
+
     CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -712,6 +753,10 @@ void CSphere3DDlg::OnLButtonUp(UINT nFlags, CPoint point)
     }
     if (m_bDraggingXArrow) {
         m_bDraggingXArrow = false;
+        ReleaseCapture();
+    }
+    if (m_bDraggingLegend) {
+        m_bDraggingLegend = false;
         ReleaseCapture();
     }
     CDialogEx::OnLButtonUp(nFlags, point);
@@ -740,6 +785,11 @@ void CSphere3DDlg::OnMouseMove(UINT nFlags, CPoint point)
             //if (abs(dx) > abs(dy)) m_yRot += dx * 0.5f; // 横向拖动：绕 Y 轴
             //else m_zRot += dy * 0.5f;                   // 纵向拖动：绕 Z 轴
             m_xRot += dx;
+        }
+        else if (m_bDraggingLegend) {
+            int dx = point.x - m_prevPoint.x;
+            int dy = point.y - m_prevPoint.y;
+            m_legendPos.Offset(dx, dy);
         }
         else if (nFlags & MK_CONTROL)
         {

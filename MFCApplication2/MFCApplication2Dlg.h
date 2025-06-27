@@ -44,4 +44,7 @@ public:
 	bool InterpilateSurface(int nLongitudeLines, int nLatitudeLines);
 	float LinearInterpolation(const std::vector<float>& x,
 		const std::vector<float>& y, float xi);
+
+	std::vector<Point3D > m_pointForce;
+	bool LoadForceDataFromFile(const std::wstring& filename);
 };

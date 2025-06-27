@@ -95,6 +95,7 @@ void CMFCApplication2Dlg::OnBnClickedButton1()
 	// TODO: 在此添加控件通知处理程序代码
 
 	LoadPointDataFromFile(L"D:\\Github\\TOOLS\\MFCApplication1\\B8527\\PMM_RD.dat");
+	LoadForceDataFromFile(L"D:\\Github\\TOOLS\\MFCApplication1\\B8527\\FIN_FILE.dat");
 
 	nLongitudeLines = m_pointCloud.size();
 	nLatitudeLines = m_pointCloud[0].size();
@@ -103,6 +104,7 @@ void CMFCApplication2Dlg::OnBnClickedButton1()
 
 	CSphere3DDlg dlg;
 	dlg.m_spherePoints = m_pointSurface;
+	dlg.m_forcePoints = m_pointForce;
 	dlg.DoModal();
 }
 
@@ -172,6 +174,63 @@ bool CMFCApplication2Dlg::LoadPointDataFromFile(const std::wstring& filename) {
 		CString msg;
 		msg.Format(_T("第%d行数据格式错误: %s"), lineNum, line.c_str());
 		AfxMessageBox(msg);
+	}
+
+	file.close();
+
+	if (m_pointCloud.empty()) {
+		AfxMessageBox(_T("文件未包含有效数据"));
+		return false;
+	}
+
+
+	return true;
+}
+
+bool CMFCApplication2Dlg::LoadForceDataFromFile(const std::wstring& filename) {
+	// 清空现有数据
+	m_pointForce.clear();
+	// 打开文件
+	std::wifstream file(filename);
+	if (!file.is_open()) {
+		AfxMessageBox(_T("无法打开文件"));
+		return false;
+	}
+
+	// 设置UTF-8本地化（支持中文路径）
+	//std::locale utf8_locale(std::locale(), new std::codecvt_utf8<wchar_t>);
+	//file.imbue(utf8_locale);
+
+	std::wstring line;
+	int lineNum = 0;
+	std::getline(file, line);
+	std::getline(file, line);
+	std::getline(file, line);
+	std::getline(file, line);
+	std::getline(file, line);
+
+	while (std::getline(file, line)) {
+		lineNum++;
+
+		// 跳过空行和注释行（以#开头）
+		if (line.empty() || line[0] == L'#') {
+			continue;
+		}
+
+		std::wistringstream iss(line);
+		Point3D point;
+		wchar_t sep;
+
+		// 尝试读取三种常见格式：
+		// 1. x y z
+		// 2. x,y,z
+		// 3. x; y; z
+
+		// 尝试空格分隔
+		float time, F2, F3, F1, M2, M3, M1;
+		if (iss >> time >> F2 >> F3 >> F1 >> M2 >> M3 >> M1) {
+			m_pointForce.push_back(Point3D(M2, M3, F1));
+		}
 	}
 
 	file.close();

@@ -59,7 +59,9 @@ private:
     void DrawArrow(float x1, float y1, float z1,
         float x2, float y2, float z2,
         float r, float g, float b);
+
     void DrawSphere();
+    void DrawForcePoints();
 
 public:
     afx_msg void OnPaint();
@@ -83,4 +85,7 @@ public:
     float axisLengthX, axisLengthXNeg;
     float axisLengthY, axisLengthYNeg;
     float axisLengthZ, axisLengthZNeg;
+
+    //散点坐标
+    std::vector<Point3D> m_forcePoints;
 };

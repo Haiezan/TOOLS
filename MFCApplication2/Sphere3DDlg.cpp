@@ -211,6 +211,9 @@ void CSphere3DDlg::DrawScene()
     // 绘制曲面
     DrawSphere();
 
+    //绘制点
+    DrawForcePoints();
+
     DrawAxes();
 
     SwapBuffers(m_pDC->GetSafeHdc());
@@ -581,6 +584,21 @@ void CSphere3DDlg::DrawSphere()
         glEnd();
     }
 }
+
+void CSphere3DDlg::DrawForcePoints()
+{
+    if (m_forcePoints.empty()) return;
+
+    glPointSize(3.0f); // 点的大小，可调
+    glColor3f(1.0f, 0.0f, 0.0f); // 红色
+
+    glBegin(GL_POINTS);
+    for (const auto& pt : m_forcePoints) {
+        glVertex3f(pt.x * scaleX, pt.y * scaleY, pt.z * scaleZ);
+    }
+    glEnd();
+}
+
 
 void CSphere3DDlg::GenerateSphereData(int slices, int stacks) {
     m_spherePoints.resize(stacks + 1);

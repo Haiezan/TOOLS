@@ -21,7 +21,7 @@ CSphere3DDlg::CSphere3DDlg(CWnd* pParent)
     m_yRot = 0.0f;
     m_zRot = 225.0f;
     m_xTrans = 0.0f;
-    m_yTrans = 0.0f;
+    m_yTrans = -0.7f;
     m_zTrans = -5.0f;
     m_zoom = 1.0f;
     m_bDragging = false;
@@ -208,6 +208,11 @@ void CSphere3DDlg::DrawScene()
     glRotatef(m_yRot, 0.0f, 1.0f, 0.0f);
     glRotatef(m_zRot, 0.0f, 0.0f, 1.0f);
 
+    // 局部变换（绕物体自身坐标轴）
+    glRotatef(m_modelRotX, 1.0f, 0.0f, 0.0f);
+    glRotatef(m_modelRotY, 0.0f, 1.0f, 0.0f);
+    glRotatef(m_modelRotZ, 0.0f, 0.0f, 1.0f);
+
     // 绘制曲面
     DrawSphere();
 
@@ -257,7 +262,7 @@ void CSphere3DDlg::DrawAxisLabels()
     graphics.SetSmoothingMode(SmoothingModeAntiAlias);
     graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 
-    FontFamily fontFamily(L"Arial");
+    FontFamily fontFamily(L"Times New Roman");
     Gdiplus::Font font(&fontFamily, 12, FontStyleRegular, UnitPixel);
     SolidBrush textBrush(Color(0, 0, 0)); // 黑色文本
 
@@ -327,19 +332,19 @@ void CSphere3DDlg::DrawAxisTicks(Graphics& graphics, Gdiplus::Font& font, SolidB
     if (isXAxis) {
         axisLengthWorldNeg = axisLengthXNeg / scaleX;
         axisLengthWorld = axisLengthX / scaleX;
-        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg);
+        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg, scaleX);
         scale = scaleX;
     }
     else if (isYAxis) {
-        axisLengthWorldNeg = axisLengthYNeg / scaleX;
+        axisLengthWorldNeg = axisLengthYNeg / scaleY;
         axisLengthWorld = axisLengthY / scaleY;
-        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg);
+        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg, scaleY);
         scale = scaleY;
     }
     else if (isZAxis) {
-        axisLengthWorldNeg = axisLengthZNeg / scaleX;
+        axisLengthWorldNeg = axisLengthZNeg / scaleZ;
         axisLengthWorld = axisLengthZ / scaleZ;
-        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg) * 10;
+        spacing = ComputeTickSpacing(axisLengthWorld + axisLengthWorldNeg, scaleZ);
         scale = scaleZ;
     }
 
@@ -379,10 +384,10 @@ void CSphere3DDlg::DrawAxisTicks(Graphics& graphics, Gdiplus::Font& font, SolidB
 }
 
 
-float CSphere3DDlg::ComputeTickSpacing(float axisWorldLength)
+float CSphere3DDlg::ComputeTickSpacing(float axisWorldLength, float scale)
 {
-    float desiredScreenSpacing = 300.0f; // 最小像素间隔（可调）
-    float approxTickCount = (axisWorldLength * m_zoom) / desiredScreenSpacing;
+    float desiredScreenSpacing =1.f; // 最小像素间隔（可调）
+    float approxTickCount = (axisWorldLength * scale * m_zoom) / desiredScreenSpacing;
     if (approxTickCount < 1) approxTickCount = 1;
 
     float rawSpacing = axisWorldLength / approxTickCount;
@@ -784,7 +789,8 @@ void CSphere3DDlg::OnMouseMove(UINT nFlags, CPoint point)
             int dy = point.y - m_prevPoint.y;
             //if (abs(dx) > abs(dy)) m_yRot += dx * 0.5f; // 横向拖动：绕 Y 轴
             //else m_zRot += dy * 0.5f;                   // 纵向拖动：绕 Z 轴
-            m_xRot += dx;
+            //m_xRot += dx;
+            m_modelRotX += dx * 0.5f; // ← 这是局部 X 轴旋转
         }
         else if (m_bDraggingLegend) {
             int dx = point.x - m_prevPoint.x;

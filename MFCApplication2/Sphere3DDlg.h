@@ -54,7 +54,7 @@ private:
     void DrawAxisTicks(Gdiplus::Graphics& graphics, Gdiplus::Font& font, Gdiplus::SolidBrush& brush,
         CPoint startPoint2D, CPoint endPoint2D,
         bool isXAxis, bool isYAxis, bool isZAxis);
-    float ComputeTickSpacing(float axisWorldLength);
+    float ComputeTickSpacing(float axisWorldLength, float scale);
     void DrawAxes();
     void DrawArrow(float x1, float y1, float z1,
         float x2, float y2, float z2,
@@ -82,6 +82,11 @@ public:
     afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 
     bool m_bDraggingXArrow = false;
+
+    //局部旋转矩阵
+    float m_modelRotX = 0.0f;
+    float m_modelRotY = 0.0f;
+    float m_modelRotZ = 0.0f;
 
     //曲面坐标
     void GenerateSphereData(int slices, int stacks);
